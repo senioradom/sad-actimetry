@@ -1,4 +1,4 @@
-# Actimetry SeniorAdom
+# SeniorAdom Actimetry
 
 ## Initialisation
 
