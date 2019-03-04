@@ -1,15 +1,21 @@
 {
   "name": "sad-actimetry",
   "description": "Actimetry SeniorAdom",
-  "version": "1.0.0",
-  "homepage": "www.senioradom.com",
+  "version": "1.0.1",
+  "homepage": "http://www.senioradom.com",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.config.js",
     "start:dist": "cross-env NODE_ENV=production webpack-dev-server --config ./config/webpack.config.js && http-server ./dist -o",
-    "lint:js": "./node_modules/.bin/eslint \"src/**/*.js\"",
+    "lint:js": "eslint \"src/**/*.js\"",
     "build:dist": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
   },
-  "keywords": ["SeniorAdom", "Actimetry"],
+  "keywords": [
+    "SeniorAdom",
+    "Actimetry"
+  ],
+  "files": [
+    "dist"
+  ],
   "author": "developer@senioradom.com",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -49,9 +55,7 @@
     "webpack": "^4.29.1",
     "webpack-cli": "^3.2.3",
     "webpack-merge": "^4.2.1",
-    "webpackbar": "^3.1.5"
-  },
-  "dependencies": {
+    "webpackbar": "^3.1.5",
     "moment": "2.22.2",
     "moment-timezone": "0.5.17",
     "chalk": "^2.4.2",
@@ -64,5 +68,16 @@
     "reset-css": "^4.0.1",
     "sanitize.css": "^8.0.0",
     "webpack-dev-server": "^3.1.10"
+  },
+  "dependencies": {
+  },
+  "main": "dist/actimetry.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senioradom/sad-actimetry.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/senioradom/sad-actimetry/issues"
   }
 }
