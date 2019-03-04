@@ -133,8 +133,9 @@ npm run start
 npm run build:dist
 
 # Generated files
-actimetry.5576a43a73f75b4f165a.js
-style.17339849fdf5ffcae9eb.css
+actimetry.js
+actimetry.css
+index.html
 ```
 
 ## Sources
