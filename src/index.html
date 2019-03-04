@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SAD - Actimetry</title>
+    <meta name="description" content=""/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data.min.js"></script>
+</head>
+<body>
+
+<h1>SAD - Actimetry</h1>
+
+<h2>Presences</h2>
+<div id="presences" class="actimetry"></div>
+
+<h2>Temperatures</h2>
+<p>24H</p>
+<div id="temperatures-24h" class="actimetry"></div>
+<p>Week</p>
+<div id="temperatures-week" class="actimetry"></div>
+
+<h2>Sleeps</h2>
+<div id="sleeps" class="actimetry"></div>
+
+<h2>Outings</h2>
+<div id="outings" class="actimetry"></div>
+
+<h2>Activities</h2>
+<p>24H</p>
+<div id="activities-24h" class="actimetry"></div>
+<p>Week</p>
+<div id="activities-week" class="actimetry"></div>
+
+<script>
+  var callback = function () {
+    const timezone = 'Europe/Paris';
+
+    const todayAtEndOfDay = moment()
+      .tz(timezone)
+      .endOf('day')
+      .format('YYYY-MM-DD');
+
+    const now = moment()
+      .tz(timezone)
+      .format('YYYY-MM-DD');
+
+    const threeDaysAgoAtEndOfDay = moment(todayAtEndOfDay)
+      .tz(timezone)
+      .subtract(3, 'days')
+      .format('YYYY-MM-DD');
+
+    const oneWeekAgo = moment(now)
+      .tz(timezone)
+      .subtract(6, 'days')
+      .format('YYYY-MM-DD');
+
+    const twenty24hoursAgo = moment(now)
+      .tz(timezone)
+      .subtract(1, 'days')
+      .format('YYYY-MM-DD');
+
+
+    const actimetry = new Actimetry({
+      username: 'user@domain.com',
+      password: '$passw0rD',
+      contractRef: 'A0000XXX'
+    });
+
+    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
+
+    actimetry.temperatures.draw('#temperatures-week', 'week', oneWeekAgo, now);
+    actimetry.temperatures.draw('#temperatures-24h', '24h', twenty24hoursAgo, now);
+
+    actimetry.sleeps.draw('#sleeps', oneWeekAgo, now);
+
+    actimetry.outings.draw('#outings', oneWeekAgo, now);
+
+    actimetry.activities.draw('#activities-24h', twenty24hoursAgo, now);
+    actimetry.activities.draw('#activities-week', oneWeekAgo, now);
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    callback();
+  });
+</script>
+</body>
+</html>
