@@ -1,7 +1,7 @@
 /* global echarts */
 /* global moment */
 
-export default class Temperatures {
+export default class TemperaturesLegacy {
   constructor(config) {
     this.config = config;
   }

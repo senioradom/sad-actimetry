@@ -17,10 +17,7 @@
 <div id="presences" class="actimetry"></div>
 
 <h2>Temperatures</h2>
-<p>24H</p>
-<div id="temperatures-24h" class="actimetry"></div>
-<p>Week</p>
-<div id="temperatures-week" class="actimetry"></div>
+<div id="temperatures" class="actimetry"></div>
 
 <h2>Sleeps</h2>
 <div id="sleeps" class="actimetry"></div>
@@ -71,8 +68,7 @@
 
     actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
 
-    actimetry.temperatures.draw('#temperatures-week', 'week', oneWeekAgo, now);
-    actimetry.temperatures.draw('#temperatures-24h', '24h', twenty24hoursAgo, now);
+    actimetry.temperatures.draw('#temperatures', oneWeekAgo, now);
 
     actimetry.sleeps.draw('#sleeps', oneWeekAgo, now);
 
