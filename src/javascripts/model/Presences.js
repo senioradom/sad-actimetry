@@ -17,6 +17,8 @@ export default class Presences {
   }
 
   async fetchAndDraw(element, start, end) {
+    document.querySelector(element).classList.add('loading');
+
     const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
@@ -159,6 +161,7 @@ export default class Presences {
     if (this.option && typeof this.option === 'object') {
       this.chart.setOption(this.option, true);
       this.initEvents();
+      document.querySelector(element).classList.remove('loading');
     }
   }
 
