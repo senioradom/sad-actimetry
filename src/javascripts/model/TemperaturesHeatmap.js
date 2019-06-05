@@ -17,7 +17,9 @@ export default class TemperaturesHeatmap {
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element).classList.add('loading');
+    document.querySelector(element)
+      .classList
+      .add('loading');
 
     const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
@@ -52,7 +54,9 @@ export default class TemperaturesHeatmap {
           }
 
           temperatures.data[theDate].forEach((value) => {
-            const currentHour = moment(value.createdAt).tz(self.config.contract.timezone).hour();
+            const currentHour = moment(value.createdAt)
+              .tz(self.config.contract.timezone)
+              .hour();
             temporaryTemperaturesObject[theDate][currentHour] = Math.max(temporaryTemperaturesObject[theDate][currentHour], Number(`${Math.round(`${value.temp}e2`)}e-2`));
           });
         }
@@ -63,7 +67,10 @@ export default class TemperaturesHeatmap {
     Object.keys(temporaryTemperaturesObject)
       .forEach((theDate) => {
         if (Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject, theDate)) {
-          gfxConfig.days.push(moment(theDate).tz(self.config.contract.timezone).locale('fr').format('dddd DD/MM'));
+          gfxConfig.days.push(moment(theDate)
+            .tz(self.config.contract.timezone)
+            .locale('fr')
+            .format('dddd DD/MM'));
 
           Object.keys(temporaryTemperaturesObject[theDate])
             .forEach((hour) => {
@@ -98,8 +105,8 @@ export default class TemperaturesHeatmap {
       },
       animation: false,
       grid: {
-        height: '50%',
-        y: '10%',
+        height: '70%',
+        y: '0%',
       },
       xAxis: {
         type: 'category',
@@ -115,84 +122,103 @@ export default class TemperaturesHeatmap {
           show: true,
         },
       },
-      visualMap: [{
-        type: 'piecewise',
-        calculable: true,
-        orient: 'horizontal',
-        left: 'center',
-        show: false, // Hide legend
-        bottom: '15%',
-        pieces: [{
-          lt: 12,
-          label: '< 12',
-          color: '#0A2CFF',
+      visualMap: [
+        {
+          min: 12,
+          max: 30,
+          calculable: true,
+          orient: 'horizontal',
+          left: 'center',
+          bottom: '15%',
+          inRange: {
+            color: ['#0A2CFF', '#006EFF', '#3D97FF', '#72B1FF', '#21DB9B', '#00FF00', '#2EFF00', '#F2FF00', '#FF9F00', '#FF7900', '#FF0000'],
+          },
+          formatter(params) {
+            return `${params}°`;
+          },
         },
         {
-          lt: 14,
-          gte: 12,
-          label: '12 - 14',
-          color: '#006EFF',
+          type: 'piecewise',
+          calculable: true,
+          orient: 'horizontal',
+          left: 'center',
+          show: false, // Hide legend
+          bottom: '15%',
+          pieces: [{
+            lt: 12,
+            label: '< 12',
+            color: '#0A2CFF',
+          },
+          {
+            lt: 14,
+            gte: 12,
+            label: '12 - 14',
+            color: '#006EFF',
+          },
+          {
+            gte: 14,
+            lt: 16,
+            label: '14 - 16',
+            color: '#3D97FF',
+          },
+          {
+            gte: 16,
+            lt: 18,
+            label: '16 - 18',
+            color: '#72B1FF',
+          },
+          {
+            gte: 18,
+            lt: 20,
+            label: '18 - 20',
+            color: '#21DB9B',
+          },
+          {
+            gte: 20,
+            lt: 22,
+            label: '20 - 22',
+            color: '#00FF00',
+          },
+          {
+            gte: 22,
+            lt: 24,
+            label: '22 - 24',
+            color: '#2EFF00',
+          },
+          {
+            gte: 24,
+            lt: 26,
+            label: '24 - 26',
+            color: '#F2FF00',
+          },
+          {
+            gte: 26,
+            lt: 28,
+            label: '26 - 28',
+            color: '#FF9F00',
+          },
+          {
+            gte: 28,
+            lt: 30,
+            label: '28 - 30',
+            color: '#FF7900',
+          },
+          {
+            gte: 30,
+            label: '>= 30',
+            color: '#FF0000',
+          }],
         },
-        {
-          gte: 14,
-          lt: 16,
-          label: '14 - 16',
-          color: '#3D97FF',
-        },
-        {
-          gte: 16,
-          lt: 18,
-          label: '16 - 18',
-          color: '#72B1FF',
-        },
-        {
-          gte: 18,
-          lt: 20,
-          label: '18 - 20',
-          color: '#21DB9B',
-        },
-        {
-          gte: 20,
-          lt: 22,
-          label: '20 - 22',
-          color: '#00FF00',
-        },
-        {
-          gte: 22,
-          lt: 24,
-          label: '22 - 24',
-          color: '#2EFF00',
-        },
-        {
-          gte: 24,
-          lt: 26,
-          label: '24 - 26',
-          color: '#F2FF00',
-        },
-        {
-          gte: 26,
-          lt: 28,
-          label: '26 - 28',
-          color: '#FF9F00',
-        },
-        {
-          gte: 28,
-          lt: 30,
-          label: '28 - 30',
-          color: '#FF7900',
-        },
-        {
-          gte: 30,
-          label: '>= 30',
-          color: '#FF0000',
-        }],
-      }],
+      ],
       series: [{
         name: 'Temperature',
         type: 'heatmap',
         data: dataset,
         label: {
           normal: {
+            formatter(params) {
+              return `${params.value[2]}°`;
+            },
             color: 'black',
             show: true,
           },
@@ -208,7 +234,9 @@ export default class TemperaturesHeatmap {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
-      document.querySelector(element).classList.remove('loading');
+      document.querySelector(element)
+        .classList
+        .remove('loading');
     }
   }
 }
