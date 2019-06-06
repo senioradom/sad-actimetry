@@ -19,6 +19,9 @@
 <h2>Temperatures</h2>
 <div id="temperatures" class="actimetry temperatures"></div>
 
+<h2>Activities and Sleeps</h2>
+<div id="activities-and-sleeps" class="actimetry activities-and-sleeps"></div>
+
 <h2>Sleeps</h2>
 <div id="sleeps" class="actimetry"></div>
 
@@ -64,6 +67,8 @@
       password: '$passw0rD',
       contractRef: 'A0000XXX'
     });
+
+    actimetry.activitiesAndSleeps.draw('#activities-and-sleeps', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
 
     actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
 

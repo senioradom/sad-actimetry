@@ -7,6 +7,7 @@ import TemperaturesHeatmap from './model/TemperaturesHeatmap';
 import Outings from './model/Outings';
 import Sleeps from './model/Sleeps';
 import Activities from './model/Activities';
+import ActivitiesAndSleeps from './model/ActivitiesAndSleeps';
 
 import '../stylesheets/styles.scss';
 
@@ -18,5 +19,6 @@ export default class Actimetry {
     this.sleeps = new Sleeps(this.config);
     this.outings = new Outings(this.config);
     this.activities = new Activities(this.config);
+    this.activitiesAndSleeps = new ActivitiesAndSleeps(this.config);
   }
 }
