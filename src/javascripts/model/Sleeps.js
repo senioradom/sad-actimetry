@@ -17,102 +17,144 @@ export default class Sleeps {
   }
 
   async fetchAndDraw(element, start, end) {
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
+    // @todo : Plug to real data
+    // const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    //   headers: {
+    //     authorization: `Basic ${this.config.credentials}`,
+    //   },
+    //   method: 'GET',
+    // });
+
+    // const sleeps = await response.json();
+
+    const sleeps = {
+      data: {
+        dates: ['2019-06-07T00:00:00+0200', '2019-06-08T00:00:00+0200', '2019-06-09T00:00:00+0200', '2019-06-10T00:00:00+0200', '2019-06-11T00:00:00+0200', '2019-06-12T00:00:00+0200', '2019-06-13T00:00:00+0200'],
+        sleepsDurations: ['PT7H19M27S', 'PT6H22M', 'PT8H29M22S', 'PT4H5M58S', 'PT7H51M56S', 'PT8H55M15S', 'PT5H3M52S'],
+        sleepsDurationsDailyAverages: ['PT6H50M50S', 'PT9H59M19S', 'PT9H10M7S', 'PT4H30M48S', 'PT5H59M11S', 'PT6H50M7S', 'PT7H3M59S'],
       },
-      method: 'GET',
-    });
-
-    const sleeps = await response.json();
-    this.initDataset(sleeps, element);
-  }
-
-  initDataset(sleeps, element) {
-    const dataset = [];
-    const gfxConfig = {
-      min: Number.MAX_SAFE_INTEGER,
-      max: Number.MIN_SAFE_INTEGER,
     };
 
-    Object.keys(sleeps.data)
-      .forEach((theDate) => {
-        const duration = (moment.duration(sleeps.data[theDate].duration)
-          .valueOf() / (1000 * 60 * 60)) % 24;
+    this.initDataset(sleeps.data, element);
+  }
 
-        dataset.push([theDate, duration, sleeps.data[theDate]]);
+  initDataset(dataset, element) {
+    const gfxConfig = {
+      colors: ['#96bed8', '#639fa6'],
+    };
 
-        if (duration < gfxConfig.min) {
-          gfxConfig.min = duration;
-        }
-        if (duration > gfxConfig.max) {
-          gfxConfig.max = duration;
-        }
-      });
+    dataset.sleepsDurations.forEach((value, key) => {
+      dataset.sleepsDurations[key] = moment.utc(moment.duration(value)
+        .as('milliseconds'))
+        .valueOf();
+    });
+
+    dataset.sleepsDurationsDailyAverages.forEach((value, key) => {
+      dataset.sleepsDurationsDailyAverages[key] = moment.utc(moment.duration(value)
+        .as('milliseconds'))
+        .valueOf();
+    });
 
     this.setOptions(dataset, gfxConfig, element);
   }
 
   setOptions(dataset, gfxConfig, element) {
     const myChart = echarts.init(document.querySelector(element));
-    const self = this;
 
     this.option = {
-      color: ['#81b41d'],
+      color: gfxConfig.colors,
+
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           animation: true,
         },
-        formatter(sleeps) {
-          return `
-          Heure de couché : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          Heure de levé : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          ${sleeps[0].data[2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0].data[2].wakeNumber} reprise${sleeps[0].data[2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
-          `;
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
+        position(pos) {
+          return {
+            top: 10,
+            left: pos[0],
+          };
+        },
+        formatter(params) {
+          let htmlTooltip = `
+<div class="sleeps-tooltip">
+<p class="header">Le ${moment(params[0].axisValue)
+    .format('DD/MM/YYYY')}</p>
+`;
+          htmlTooltip += `
+<p>Durée du sommeil : <strong>${moment.utc(moment.duration(params[0].value)
+    .as('milliseconds'))
+    .format('HH[h]mm')}</strong></p>
+<p>Moyenne des ${moment(params[0].axisValue)
+    .format('dddd')} : <strong>${moment(params[1].value)
+  .format('HH[h]mm')}</strong></p>
+</div>
+`;
+          return htmlTooltip;
         },
       },
-      calculable: true,
+      grid: {
+        right: '20%',
+      },
       xAxis: [
         {
-          nameLocation: 'end',
-          interval: 86400000,
           type: 'category',
+          axisTick: {
+            alignWithLabel: true,
+          },
           axisLabel: {
-            nameLocation: 'end',
-            formatter(value) {
-              return moment(value)
+            formatter(theDate) {
+              return moment(theDate)
                 .format('DD/MM');
+            },
+          },
+          data: dataset.dates,
+        },
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          axisLine: {
+            lineStyle: {
+              color: '#222',
+            },
+          },
+          axisLabel: {
+            formatter(value) {
+              let roundedMinutes = Math.floor(moment.utc(moment.duration(value)
+                .as('milliseconds'))
+                .minute() / 30) * 30;
+
+              if (!roundedMinutes) {
+                roundedMinutes = '00';
+              }
+
+              return moment.utc(moment.duration(value)
+                .as('milliseconds'))
+                .format(`HH[h${roundedMinutes}]`);
             },
           },
         },
       ],
-      yAxis: {
-        minInterval: 1,
-        min: parseInt(gfxConfig.min, 10),
-        max: parseInt(gfxConfig.max, 10),
-        type: 'value',
-      },
-      dataZoom: [
+      series: [
         {
-          type: 'slider',
-          xAxisIndex: 0,
-          filterMode: 'empty',
+          type: 'bar',
+          data: dataset.sleepsDurations,
         },
         {
-          type: 'inside',
-          xAxisIndex: 0,
-          filterMode: 'empty',
+          type: 'line',
+          data: dataset.sleepsDurationsDailyAverages,
         },
       ],
-      series: [{
-        data: dataset,
-        type: 'bar',
-      }],
     };
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+      document.querySelector(element)
+        .classList
+        .remove('loading');
     }
   }
 }
