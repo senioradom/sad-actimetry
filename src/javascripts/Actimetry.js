@@ -8,6 +8,7 @@ import Outings from './model/Outings';
 import Sleeps from './model/Sleeps';
 import Activities from './model/Activities';
 import ActivitiesAndSleeps from './model/ActivitiesAndSleeps';
+import DailyMovesPerRoom from './model/DailyMovesPerRoom';
 
 import '../stylesheets/styles.scss';
 
@@ -20,5 +21,6 @@ export default class Actimetry {
     this.outings = new Outings(this.config);
     this.activities = new Activities(this.config);
     this.activitiesAndSleeps = new ActivitiesAndSleeps(this.config);
+    this.dailyMovesPerRoom = new DailyMovesPerRoom(this.config);
   }
 }
