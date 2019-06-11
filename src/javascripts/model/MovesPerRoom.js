@@ -1,7 +1,7 @@
 /* global echarts */
 /* global moment */
 
-export default class DailyMovesPerRoom {
+export default class MovesPerRoom {
   constructor(config) {
     this.config = config;
   }

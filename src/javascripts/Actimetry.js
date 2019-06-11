@@ -8,7 +8,7 @@ import Outings from './model/Outings';
 import SleepsLegacy from './model/SleepsLegacy';
 import Activities from './model/Activities';
 import ActivitiesAndSleeps from './model/ActivitiesAndSleeps';
-import DailyMovesPerRoom from './model/DailyMovesPerRoom';
+import MovesPerRoom from './model/MovesPerRoom';
 import Sleeps from './model/Sleeps';
 
 import '../stylesheets/styles.scss';
@@ -22,7 +22,7 @@ export default class Actimetry {
     this.outings = new Outings(this.config);
     this.activities = new Activities(this.config);
     this.activitiesAndSleeps = new ActivitiesAndSleeps(this.config);
-    this.dailyMovesPerRoom = new DailyMovesPerRoom(this.config);
+    this.movesPerRoom = new MovesPerRoom(this.config);
     this.sleeps = new Sleeps(this.config);
   }
 }
