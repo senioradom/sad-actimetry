@@ -53,6 +53,7 @@ div.actimetry {
     top: 13px;
     margin-top: 21px;
     margin-bottom: 34px;
+    text-transform: uppercase;
   }
 }
 
@@ -71,9 +72,14 @@ div.actimetry {
 
 .icon-activities,
 .icon-sleeps {
-  width: 41px;
-  height: 42px;
+  width: 20px;
+  height: 20px;
   border: 1px solid #222;
+  position: absolute;
+  left: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .icon-activities {

@@ -456,15 +456,14 @@ export default class ActivitiesAndSleeps {
 
           let htmlTooltip = `
 <div class="activities-and-sleeps-tooltip">
-<p class="header header--activities">Activités</p>
-`;
+<p class="header header--activities"><i class="icon-activities"></i> Activités</p>`;
           activites.forEach((item) => {
             htmlTooltip += `<p>${item.seriesName}: <strong>${moment.utc(item.data)
               .format('HH[h]mm')}</strong></p>`;
           });
 
           htmlTooltip += `
-<p class="header header--sleeps">Sommeil</p>
+<p class="header header--sleeps"><i class="icon-sleeps"></i> Sommeil</p>
 <p>Durée : <strong>${moment.utc(moment.duration(sleep.duration)
     .as('milliseconds'))
     .format('HH[h]mm')}</strong></p>
