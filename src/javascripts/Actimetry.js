@@ -8,7 +8,7 @@ import TemperaturesLegacy from './model/TemperaturesLegacy';
 import Outings from './model/Outings';
 import SleepsLegacy from './model/SleepsLegacy';
 import Activities from './model/Activities';
-import ActivitiesAndSleeps from './model/ActivitiesAndSleeps';
+import PresencesAndSleep from './model/PresencesAndSleep';
 import MovesPerRoom from './model/MovesPerRoom';
 import Sleeps from './model/Sleeps';
 
@@ -23,7 +23,7 @@ export default class Actimetry {
     this.sleepsLegacy = new SleepsLegacy(this.config);
     this.outings = new Outings(this.config);
     this.activities = new Activities(this.config);
-    this.activitiesAndSleeps = new ActivitiesAndSleeps(this.config);
+    this.presencesAndSleep = new PresencesAndSleep(this.config);
     this.movesPerRoom = new MovesPerRoom(this.config);
     this.sleeps = new Sleeps(this.config);
   }

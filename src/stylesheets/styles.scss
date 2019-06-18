@@ -3,7 +3,7 @@ div.actimetry {
   height: 500px;
 
   &.temperatures,
-  &.activities-and-sleeps {
+  &.presences-and-sleep {
     height: 760px;
   }
 
@@ -41,7 +41,7 @@ div.actimetry {
   }
 }
 
-.activities-and-sleeps-tooltip {
+.presences-and-sleep-tooltip {
   color: #222;
 
   .header {
