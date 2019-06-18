@@ -17,7 +17,7 @@ export default class SleepsLegacy {
   }
 
   async fetchAndDraw(element, start, end) {
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -35,12 +35,12 @@ export default class SleepsLegacy {
       max: Number.MIN_SAFE_INTEGER,
     };
 
-    Object.keys(sleeps.data)
+    Object.keys(sleeps)
       .forEach((theDate) => {
-        const duration = (moment.duration(sleeps.data[theDate].duration)
+        const duration = (moment.duration(sleeps[theDate].duration)
           .valueOf() / (1000 * 60 * 60)) % 24;
 
-        dataset.push([theDate, duration, sleeps.data[theDate]]);
+        dataset.push([theDate, duration, sleeps[theDate]]);
 
         if (duration < gfxConfig.min) {
           gfxConfig.min = duration;
@@ -66,9 +66,13 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          Heure de couché : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          Heure de levé : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          ${sleeps[0].data[2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0].data[2].wakeNumber} reprise${sleeps[0].data[2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
+          Heure de couché : ${moment(sleeps[0][2].start)
+            .tz(self.config.contract.timezone)
+            .format('HH:mm')}<br>
+          Heure de levé : ${moment(sleeps[0][2].end)
+            .tz(self.config.contract.timezone)
+            .format('HH:mm')}<br>
+          ${sleeps[0][2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0][2].wakeNumber} reprise${sleeps[0][2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
           `;
         },
       },

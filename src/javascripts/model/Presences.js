@@ -17,9 +17,11 @@ export default class Presences {
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element).classList.add('loading');
+    document.querySelector(element)
+      .classList
+      .add('loading');
 
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -41,7 +43,7 @@ export default class Presences {
     gfxConfig.roomsMapping = rooms.mapping;
 
     let dataset = this.rangesToPresences(ranges, gfxConfig);
-    dataset = this.renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.data.lastUpdate)
+    dataset = this.renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.lastUpdate)
       .valueOf());
     gfxConfig.zoomLevel = this.zoomLevel(gfxConfig.min, gfxConfig.max);
 
@@ -161,7 +163,9 @@ export default class Presences {
     if (this.option && typeof this.option === 'object') {
       this.chart.setOption(this.option, true);
       this.initEvents();
-      document.querySelector(element).classList.remove('loading');
+      document.querySelector(element)
+        .classList
+        .remove('loading');
     }
   }
 
@@ -174,34 +178,40 @@ export default class Presences {
     const sorted = ((() => {
       const sortedRoomsArray = [[], [], [], ['OUTING_']];
 
-      this.config.contract.kit.sensors.forEach((sensor) => {
-        mapping.idLabel[sensor.room.id] = sensor.room.label;
-        mapping.labelId[sensor.room.label] = sensor.room.id;
+      this.config.contract.rooms.forEach((room) => {
 
-        switch (sensor.type) {
-          case 'PASSIVE_INFRARED_SENSOR':
-          case 'SIGFOX_PASSIVE_INFRARED_SENSOR':
-            sortedRoomsArray[0].push(`PRESENCE_${sensor.room.label}`);
-            break;
-          case 'PRESENCE_BED_SENSOR':
-            sortedRoomsArray[1].push(`PRESSURE_${sensor.room.label}`);
-            break;
-          case 'DOOR_MAGNET_SENSOR':
-          case 'SIGFOX_DOOR_MAGNET_SENSOR':
-            sortedRoomsArray[2].push(`DOOR_OPENING_${sensor.room.label}`);
-            break;
-          default:
-            break;
-        }
+        mapping.idLabel[room.id] = room.label;
+        mapping.labelId[room.label] = room.id;
+
+        room.sensors.forEach((sensor) => {
+
+          switch (sensor.type) {
+            case 'motion':
+              sortedRoomsArray[0].push(`PRESENCE_${room.label}`);
+              break;
+            case 'bed':
+              sortedRoomsArray[1].push(`PRESSURE_${room.label}`);
+              break;
+            case 'door':
+              sortedRoomsArray[2].push(`DOOR_OPENING_${room.label}`);
+              break;
+            default:
+              break;
+          }
+        });
       });
 
       [0, 1, 2].forEach((i) => {
         sortedRoomsArray[i].sort();
       });
 
-      return (sortedRoomsArray[0].concat(sortedRoomsArray[1])
-        .concat(sortedRoomsArray[2])
-        .concat(sortedRoomsArray[3])).reverse();
+      return (
+        sortedRoomsArray[0]
+          .concat(sortedRoomsArray[1])
+          .concat(sortedRoomsArray[2])
+          .concat(sortedRoomsArray[3])
+      )
+        .reverse();
     })());
 
     return {
@@ -317,13 +327,13 @@ export default class Presences {
   rangesToPresences(ranges, gfxConfig) {
     const presences = [];
 
-    Object.keys(ranges.data.days)
+    Object.keys(ranges.days)
       .forEach((theDate) => {
-        ranges.data.days[theDate].activities.forEach((activity, index) => {
+        ranges.days[theDate].activities.forEach((activity, index) => {
           if (index === 0) {
-            const min = moment(ranges.data.days[theDate].start)
+            const min = moment(ranges.days[theDate].start)
               .valueOf();
-            const max = moment(ranges.data.days[theDate].end)
+            const max = moment(ranges.days[theDate].end)
               .valueOf();
 
             if (min < gfxConfig.min) {
@@ -373,7 +383,7 @@ export default class Presences {
 
   initEvents() {
     this.chart.on('mousemove', (params) => {
-      if (params.data.name === 'MASK') {
+      if (params.name === 'MASK') {
         this.chart.getZr()
           .setCursorStyle('default');
       } else {

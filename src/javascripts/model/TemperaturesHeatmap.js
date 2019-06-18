@@ -21,7 +21,7 @@ export default class TemperaturesHeatmap {
       .classList
       .add('loading');
 
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -29,6 +29,7 @@ export default class TemperaturesHeatmap {
     });
 
     const temperatures = await response.json();
+
     this.initDataset(temperatures, element);
   }
 
@@ -43,9 +44,9 @@ export default class TemperaturesHeatmap {
     let dataset = [];
     const temporaryTemperaturesObject = {};
 
-    Object.keys(temperatures.data)
+    Object.keys(temperatures)
       .forEach((theDate) => {
-        if (Object.prototype.hasOwnProperty.call(temperatures.data, theDate)) {
+        if (Object.prototype.hasOwnProperty.call(temperatures, theDate)) {
           if (!Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject, theDate)) {
             temporaryTemperaturesObject[theDate] = {};
             for (let hour = 0; hour <= 23; hour += 1) {
@@ -53,12 +54,13 @@ export default class TemperaturesHeatmap {
             }
           }
 
-          temperatures.data[theDate].forEach((value) => {
-            const currentHour = moment(value.createdAt)
-              .tz(self.config.contract.timezone)
-              .hour();
-            temporaryTemperaturesObject[theDate][currentHour] = Math.max(temporaryTemperaturesObject[theDate][currentHour], Number(`${Math.round(`${value.temp}e2`)}e-2`));
-          });
+          temperatures[theDate]
+            .forEach((value) => {
+              const currentHour = moment(value.createdAt)
+                .tz(self.config.contract.timezone)
+                .hour();
+              temporaryTemperaturesObject[theDate][currentHour] = Math.max(temporaryTemperaturesObject[theDate][currentHour], Number(`${Math.round(`${value.temp}e2`)}e-2`));
+            });
         }
       });
 
@@ -149,65 +151,65 @@ export default class TemperaturesHeatmap {
             label: '< 12',
             color: '#0A2CFF',
           },
-          {
-            lt: 14,
-            gte: 12,
-            label: '12 - 14',
-            color: '#006EFF',
-          },
-          {
-            gte: 14,
-            lt: 16,
-            label: '14 - 16',
-            color: '#3D97FF',
-          },
-          {
-            gte: 16,
-            lt: 18,
-            label: '16 - 18',
-            color: '#72B1FF',
-          },
-          {
-            gte: 18,
-            lt: 20,
-            label: '18 - 20',
-            color: '#21DB9B',
-          },
-          {
-            gte: 20,
-            lt: 22,
-            label: '20 - 22',
-            color: '#00FF00',
-          },
-          {
-            gte: 22,
-            lt: 24,
-            label: '22 - 24',
-            color: '#2EFF00',
-          },
-          {
-            gte: 24,
-            lt: 26,
-            label: '24 - 26',
-            color: '#F2FF00',
-          },
-          {
-            gte: 26,
-            lt: 28,
-            label: '26 - 28',
-            color: '#FF9F00',
-          },
-          {
-            gte: 28,
-            lt: 30,
-            label: '28 - 30',
-            color: '#FF7900',
-          },
-          {
-            gte: 30,
-            label: '>= 30',
-            color: '#FF0000',
-          }],
+            {
+              lt: 14,
+              gte: 12,
+              label: '12 - 14',
+              color: '#006EFF',
+            },
+            {
+              gte: 14,
+              lt: 16,
+              label: '14 - 16',
+              color: '#3D97FF',
+            },
+            {
+              gte: 16,
+              lt: 18,
+              label: '16 - 18',
+              color: '#72B1FF',
+            },
+            {
+              gte: 18,
+              lt: 20,
+              label: '18 - 20',
+              color: '#21DB9B',
+            },
+            {
+              gte: 20,
+              lt: 22,
+              label: '20 - 22',
+              color: '#00FF00',
+            },
+            {
+              gte: 22,
+              lt: 24,
+              label: '22 - 24',
+              color: '#2EFF00',
+            },
+            {
+              gte: 24,
+              lt: 26,
+              label: '24 - 26',
+              color: '#F2FF00',
+            },
+            {
+              gte: 26,
+              lt: 28,
+              label: '26 - 28',
+              color: '#FF9F00',
+            },
+            {
+              gte: 28,
+              lt: 30,
+              label: '28 - 30',
+              color: '#FF7900',
+            },
+            {
+              gte: 30,
+              label: '>= 30',
+              color: '#FF0000',
+            }],
         },
       ],
       series: [{

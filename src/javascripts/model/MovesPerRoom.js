@@ -45,7 +45,7 @@ export default class MovesPerRoom {
       rooms: [],
     };
 
-    const mappingRoomsIdsToLabels = Object.assign(...Object.entries(self.config.contract.kit.rooms)
+    const mappingRoomsIdsToLabels = Object.assign(...Object.entries(self.config.contract.rooms)
       .map(([, v]) => ({ [v.id]: v.label })));
 
     dataset.data.movesPerDayAndRoom.forEach((movePerRoom) => {

@@ -17,7 +17,7 @@ export default class Outings {
   }
 
   async fetchAndDraw(element, start, end) {
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -25,6 +25,9 @@ export default class Outings {
     });
 
     const outings = await response.json();
+
+    console.log(outings);
+
     this.initDataset(outings, element);
   }
 
@@ -35,15 +38,15 @@ export default class Outings {
       max: Number.MIN_SAFE_INTEGER,
     };
 
-    Object.keys(outings.data)
+    Object.keys(outings)
       .forEach((theDate) => {
-        dataset.push([theDate, outings.data[theDate].length, outings.data[theDate]]);
+        dataset.push([theDate, outings[theDate].length, outings[theDate]]);
 
-        if (outings.data[theDate].length < gfxConfig.min) {
-          gfxConfig.min = outings.data[theDate].length;
+        if (outings[theDate].length < gfxConfig.min) {
+          gfxConfig.min = outings[theDate].length;
         }
-        if (outings.data[theDate].length > gfxConfig.max) {
-          gfxConfig.max = outings.data[theDate].length;
+        if (outings[theDate].length > gfxConfig.max) {
+          gfxConfig.max = outings[theDate].length;
         }
       });
 

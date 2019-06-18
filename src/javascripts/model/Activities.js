@@ -17,7 +17,7 @@ export default class Activities {
   }
 
   async fetchAndDraw(element, start, end) {
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -35,12 +35,12 @@ export default class Activities {
       max: 0,
     };
 
-    Object.keys(activities.data)
+    Object.keys(activities)
       .forEach((theDate) => {
-        Object.keys(activities.data[theDate])
+        Object.keys(activities[theDate])
           .forEach(() => {
-            gfxConfig.max = Math.max(gfxConfig.max, activities.data[theDate].value);
-            dataset.push([activities.data[theDate].start, activities.data[theDate].value]);
+            gfxConfig.max = Math.max(gfxConfig.max, activities[theDate].value);
+            dataset.push([activities[theDate].start, activities[theDate].value]);
           });
       });
 
@@ -65,8 +65,7 @@ export default class Activities {
           animation: true,
         },
         formatter(value) {
-          return `${moment(value[0].data[0])
-            .format('DD/MM HH:mm')} : ${value[0].data[1]}`;
+          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${value[0].data[1]}`;
         },
       },
 

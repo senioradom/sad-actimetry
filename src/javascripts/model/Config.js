@@ -4,10 +4,7 @@ export default class Config {
   constructor(settings) {
     this.isReady = false;
 
-    this.api = {
-      actimetry: null,
-      contract: null,
-    };
+    this.api = 'https://gateway-v2.senioradom.com';
 
     this.init(settings);
   }
@@ -19,32 +16,23 @@ export default class Config {
       this.credentials = settings.basicAuth;
     }
 
-    if (settings.api && settings.api.contract) {
-      this.api.contract = settings.api.contract;
-    } else {
-      this.api.contract = sad.api.contract;
+    if (settings.api) {
+      this.api = settings.api;
+      if (this.api.endsWith('/')) {
+        this.api = this.api.substring(0, this.api.length - 1);
+      }
     }
 
-    if (settings.api && settings.api.actimetry) {
-      this.api.actimetry = settings.api.actimetry;
-    } else {
-      this.api.actimetry = sad.api.actimetry;
-    }
-
-    const response = await fetch(`${this.api.contract}/users/${settings.username}/contracts`, {
+    const response = await fetch(`${this.api}/api/3/contracts/${settings.contractRef}`, {
       headers: {
         authorization: `Basic ${this.credentials}`,
       },
       method: 'GET',
     });
 
-    const contract = await response.json();
+    this.contract = await response.json();
 
-    if (settings.contractRef) {
-      [this.contract] = contract.data.filter(c => c.ref === settings.contractRef);
-    } else {
-      [this.contract] = [contract.data[0]];
-    }
+    console.log(this.contract);
 
     if (this.contract) {
       this.isReady = true;

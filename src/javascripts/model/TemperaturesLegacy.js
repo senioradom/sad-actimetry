@@ -17,7 +17,7 @@ export default class TemperaturesLegacy {
   }
 
   async fetchAndDraw(element, type, start, end) {
-    const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
+    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
       },
@@ -35,17 +35,17 @@ export default class TemperaturesLegacy {
       max: Number.MIN_SAFE_INTEGER,
     };
 
-    Object.keys(temperatures.data)
+    Object.keys(temperatures)
       .forEach((theDate) => {
-        Object.keys(temperatures.data[theDate])
+        Object.keys(temperatures[theDate])
           .forEach((key) => {
-            if (temperatures.data[theDate][key].temp < gfxConfig.min) {
-              gfxConfig.min = temperatures.data[theDate][key].temp;
+            if (temperatures[theDate][key].temp < gfxConfig.min) {
+              gfxConfig.min = temperatures[theDate][key].temp;
             }
-            if (temperatures.data[theDate][key].temp > gfxConfig.max) {
-              gfxConfig.max = temperatures.data[theDate][key].temp;
+            if (temperatures[theDate][key].temp > gfxConfig.max) {
+              gfxConfig.max = temperatures[theDate][key].temp;
             }
-            dataset.push([temperatures.data[theDate][key].createdAt, temperatures.data[theDate][key].temp]);
+            dataset.push([temperatures[theDate][key].createdAt, temperatures[theDate][key].temp]);
           });
       });
 
@@ -70,8 +70,7 @@ export default class TemperaturesLegacy {
           animation: true,
         },
         formatter(value) {
-          return `${moment(value[0].data[0])
-            .format('HH:mm')} : ${value[0].data[1]}°C`;
+          return `${moment(value[0].data[0]).format('HH:mm')} : ${value[0].data[1]}°C`;
         },
       },
 

@@ -30,7 +30,6 @@
     "css-loader": "^2.1.0",
     "cssnano": "^4.1.8",
     "dploy": "^1.2.0",
-    "echarts": "^4.2.0-rc.2",
     "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-loader": "^2.1.2",
@@ -46,8 +45,7 @@
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.5.0",
-    "moment": "2.22.2",
-    "moment-timezone": "0.5.17",
+    "node-sass": "^4.12.0",
     "normalize.css": "^8.0.1",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "postcss-loader": "^3.0.0",
@@ -69,7 +67,9 @@
     "webpackbar": "^3.1.5"
   },
   "dependencies": {
-    "node-sass": "^4.12.0"
+    "echarts": "^4.2.0-rc.2",
+    "moment": "2.22.2",
+    "moment-timezone": "0.5.17"
   },
   "main": "dist/actimetry.js",
   "repository": {

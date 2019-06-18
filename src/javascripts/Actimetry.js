@@ -4,6 +4,7 @@ import I18n from './model/I18n';
 import Config from './model/Config';
 import Presences from './model/Presences';
 import TemperaturesHeatmap from './model/TemperaturesHeatmap';
+import TemperaturesLegacy from './model/TemperaturesLegacy';
 import Outings from './model/Outings';
 import SleepsLegacy from './model/SleepsLegacy';
 import Activities from './model/Activities';
@@ -18,6 +19,7 @@ export default class Actimetry {
     this.config = new Config(settings);
     this.presences = new Presences(this.config);
     this.temperatures = new TemperaturesHeatmap(this.config);
+    this.temperaturesLegacy = new TemperaturesLegacy(this.config);
     this.sleepsLegacy = new SleepsLegacy(this.config);
     this.outings = new Outings(this.config);
     this.activities = new Activities(this.config);
