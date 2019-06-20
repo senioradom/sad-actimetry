@@ -24,11 +24,7 @@ export default class PresencesAndSleep {
       method: 'GET',
     });
 
-    console.log(response);
-
     const roomsAndSleeps = await response.json();
-
-    console.log(roomsAndSleeps);
 
     this.initDataset(roomsAndSleeps, element);
   }
@@ -171,12 +167,8 @@ export default class PresencesAndSleep {
         },
         formatter(params) {
 
-          console.log(params);
-
           const activites = params.filter(serie => serie.seriesType === 'line');
           let sleep = params.filter(serie => serie.seriesType === 'bar');
-
-          console.log(sleep);
 
           sleep = self.tooltips[sleep[0].axisValue];
 

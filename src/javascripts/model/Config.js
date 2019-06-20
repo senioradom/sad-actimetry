@@ -32,8 +32,6 @@ export default class Config {
 
     this.contract = await response.json();
 
-    console.log(this.contract);
-
     if (this.contract) {
       this.isReady = true;
       document.dispatchEvent(new CustomEvent('actimetryIsReady'));

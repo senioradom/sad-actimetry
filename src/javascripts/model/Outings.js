@@ -26,8 +26,6 @@ export default class Outings {
 
     const outings = await response.json();
 
-    console.log(outings);
-
     this.initDataset(outings, element);
   }
 
