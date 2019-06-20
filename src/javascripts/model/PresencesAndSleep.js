@@ -62,26 +62,23 @@ export default class PresencesAndSleep {
             rawDataset.rooms[presence.room]
               .push(
                 moment.duration(presence.duration)
-                  .valueOf()
+                  .valueOf(),
               );
           });
         }
 
         if (roomsAndSleeps[theDate].sleep) {
-
           rawDataset.sleep
             .push(
               moment.duration(roomsAndSleeps[theDate].sleep.duration)
-                .valueOf()
+                .valueOf(),
             );
 
           gfxConfig.tooltips[theDate] = roomsAndSleeps[theDate].sleep;
-
         } else {
-
           rawDataset.sleep
             .push(
-              0
+              0,
             );
 
           gfxConfig.tooltips[theDate] = null;
@@ -135,9 +132,9 @@ export default class PresencesAndSleep {
       animation: false,
       legend: {
         orient: 'horizontal',
-        bottom: 10,
+        bottom: 0,
         left: 'center',
-        padding: 10,
+        padding: [0, 0, 0, 0],
         itemGap: 20,
         icon: 'bar',
         data: gfxConfig.rooms,
@@ -150,7 +147,7 @@ export default class PresencesAndSleep {
           fontSize: 24,
         },
         bottom: '21%',
-        left: 'left',
+        left: '4%',
       },
       tooltip: {
         trigger: 'axis',
@@ -166,7 +163,6 @@ export default class PresencesAndSleep {
           };
         },
         formatter(params) {
-
           const activites = params.filter(serie => serie.seriesType === 'line');
           let sleep = params.filter(serie => serie.seriesType === 'bar');
 
@@ -188,12 +184,12 @@ export default class PresencesAndSleep {
             <i class="icon-sleeps"></i> Sommeil
             </p>
             <p>Durée : <strong>${moment.utc(moment.duration(sleep.duration)
-              .as('milliseconds'))
-              .format('HH[h]mm')}</strong></p>
+    .as('milliseconds'))
+    .format('HH[h]mm')}</strong></p>
             <p>Heure de coucher : <strong>${moment(sleep.start)
-              .format('HH[h]mm')}</strong></p>
+    .format('HH[h]mm')}</strong></p>
             <p>Heure de réveil : <strong>${moment(sleep.end)
-              .format('HH[h]mm')}</strong></p>
+    .format('HH[h]mm')}</strong></p>
             <p>Nombre de levers nocturne : <strong>${sleep.wakeNumber}</strong></p>
             </div>`;
           }
@@ -213,14 +209,15 @@ export default class PresencesAndSleep {
         left: '5%',
         right: '0%',
         height: '60%',
-        width: '95%',
+        width: '90%',
       },
-        {
-          left: '0%',
-          right: '0%',
-          top: '75%',
-          height: '15%',
-        },
+      {
+        left: '5%',
+        right: '0%',
+        top: '80%',
+        width: '90%',
+        height: '15%',
+      },
       ],
       xAxis: [{
         type: 'category',
@@ -236,25 +233,25 @@ export default class PresencesAndSleep {
         min: 'dataMin',
         max: 'dataMax',
       },
-        {
-          type: 'category',
-          gridIndex: 1,
-          data: gfxConfig.xAxis,
-          axisLine: {
-            onZero: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          splitLine: {
-            show: false,
-          },
-          axisLabel: {
-            show: false,
-          },
-          min: 'dataMin',
-          max: 'dataMax',
+      {
+        type: 'category',
+        gridIndex: 1,
+        data: gfxConfig.xAxis,
+        axisLine: {
+          onZero: false,
         },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: false,
+        },
+        min: 'dataMin',
+        max: 'dataMax',
+      },
       ],
       yAxis: [{
         scale: true,
@@ -277,23 +274,23 @@ export default class PresencesAndSleep {
           show: true,
         },
       },
-        {
-          scale: true,
-          gridIndex: 1,
-          splitNumber: 2,
-          axisLabel: {
-            show: false,
-          },
-          axisLine: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          splitLine: {
-            show: false,
-          },
+      {
+        scale: true,
+        gridIndex: 1,
+        splitNumber: 2,
+        axisLabel: {
+          show: false,
         },
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+      },
       ],
       series: dataset,
     };
