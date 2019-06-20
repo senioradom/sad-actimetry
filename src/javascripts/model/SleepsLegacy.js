@@ -66,13 +66,9 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          Heure de couché : ${moment(sleeps[0][2].start)
-            .tz(self.config.contract.timezone)
-            .format('HH:mm')}<br>
-          Heure de levé : ${moment(sleeps[0][2].end)
-            .tz(self.config.contract.timezone)
-            .format('HH:mm')}<br>
-          ${sleeps[0][2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0][2].wakeNumber} reprise${sleeps[0][2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
+          Heure de couché : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
+          Heure de levé : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
+          ${sleeps[0].data[2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0].data[2].wakeNumber} reprise${sleeps[0].data[2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
           `;
         },
       },
