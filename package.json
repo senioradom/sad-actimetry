@@ -1,7 +1,7 @@
 {
   "name": "sad-actimetry",
   "description": "Actimetry SeniorAdom",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "homepage": "http://www.senioradom.com",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.config.js",
