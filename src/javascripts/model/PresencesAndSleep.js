@@ -190,7 +190,7 @@ export default class PresencesAndSleep {
     .format('HH[h]mm')}</strong></p>
             <p>Heure de réveil : <strong>${moment(sleep.end)
     .format('HH[h]mm')}</strong></p>
-            <p>Nombre de levers nocturne : <strong>${sleep.wakeNumber}</strong></p>
+            <p>Nombre de levers nocturnes : <strong>${sleep.wakeNumber}</strong></p>
             </div>`;
           }
 
