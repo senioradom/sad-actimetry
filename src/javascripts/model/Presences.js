@@ -185,7 +185,7 @@ export default class Presences {
         mapping.labelId[room.label] = room.id;
 
         room.sensors.forEach((sensor) => {
-          switch (sensor.type) {
+          switch (sensor.category) {
             case 'motion':
               sortedRoomsArray[0].push(`PRESENCE_${room.label}`);
               break;
