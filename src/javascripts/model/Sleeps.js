@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
+import I18n from './I18n';
 
 export default class Sleeps {
   constructor(config) {
@@ -62,6 +63,8 @@ export default class Sleeps {
   setOptions(dataset, gfxConfig, element) {
     const myChart = echarts.init(document.querySelector(element));
 
+    const self = this;
+
     this.option = {
       color: gfxConfig.colors,
 
@@ -85,11 +88,11 @@ export default class Sleeps {
     .format('DD/MM/YYYY')}</p>
 `;
           htmlTooltip += `
-<p>Durée du sommeil : <strong>${moment.utc(moment.duration(params[0].value)
-    .as('milliseconds'))
-    .format('HH[h]mm')}</strong></p>
-<p>Moyenne des ${moment(params[0].axisValue)
-    .format('dddd')} : <strong>${moment(params[1].value)
+<p>${I18n.strings[self.config.language].sleep_duration} : <strong>${moment.utc(moment.duration(params[0].value)
+  .as('milliseconds'))
+  .format('HH[h]mm')}</strong></p>
+<p>${I18n.strings[self.config.language].averages} ${moment(params[0].axisValue)
+  .format('dddd')} : <strong>${moment(params[1].value)
   .format('HH[h]mm')}</strong></p>
 </div>
 `;

@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
+import I18n from './I18n';
 
 export default class SleepsLegacy {
   constructor(config) {
@@ -67,9 +68,9 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          Heure de couché : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          Heure de levé : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          ${sleeps[0].data[2].wakeNumber > 0 ? `S'est levé(e) à ${sleeps[0].data[2].wakeNumber} reprise${sleeps[0].data[2].wakeNumber > 1 ? 's' : ''}` : 'Pas de levé pendant la nuit'}<br>
+          ${I18n.strings[self.config.language].bedtime} : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
+          ${I18n.strings[self.config.language].wakeup_time2} : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
+          ${sleeps[0].data[2].wakeNumber > 0 ? `${I18n.strings[self.config.language].wokeup_at} ${sleeps[0].data[2].wakeNumber} ${sleeps[0].data[2].wakeNumber > 1 ? `${I18n.strings[self.config.language].times}` : `${I18n.strings[self.config.language].time}`}` : `${I18n.strings[self.config.language].didnt_wake_up_at_night}`}<br>
           `;
         },
       },

@@ -73,7 +73,7 @@ export default class TemperaturesHeatmap {
           gfxConfig.days.push(moment(theDate)
             .tz(self.config.contract.timezone)
             // .locale('fr')
-            .format('dddd DD/MM [==>]'));
+            .format('dddd DD/MM'));
 
           Object.keys(temporaryTemperaturesObject[theDate])
             .forEach((hour) => {
