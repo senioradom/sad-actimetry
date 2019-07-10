@@ -43,6 +43,10 @@ export default class Config {
         this.language = this.contract.language;
       }
 
+      if (!['en', 'fr', 'es'].includes(this.language)) {
+        this.language = 'fr';
+      }
+
       moment.locale(this.language);
 
       document.dispatchEvent(new CustomEvent('actimetryIsReady'));
