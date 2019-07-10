@@ -47,6 +47,7 @@ At least one from
 `contractRef` : allows to select one contract when user is associated to many  
 `api.contract` : override contract API environment variable  
 `api.actimetry` : override actimetry API environment variable  
+`language` : language, ['en', 'fr', 'es'], default : 'fr'
 
 ## Usage
 
@@ -156,18 +157,3 @@ The project is dependant on the following libraries :
 - [ECharts](https://ecomfe.github.io/echarts-doc/public/en/index.html)
 - [Moment.js](https://momentjs.com/)
 - [Moment Timezone](https://momentjs.com/timezone/)
-
-### Optimizations
-
-```
-// config/webpack.config.js
-module.exports = () => ({
-  externals: {
-    echarts: 'echarts',
-    moment: 'moment',
-  },
-});
-```
-Due to an [open issue on echarts](https://github.com/apache/incubator-echarts/issues/8239), the libraries are not bundled by default within the package (because this increase the weight considerably (200kb to 2MB+)).   
-We then need to add echarts and moment.js ourselves.
-To bundle them anyway, just comment out the 'externals' node.

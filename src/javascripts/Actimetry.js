@@ -2,6 +2,7 @@
 import I18n from './model/I18n';
 /* eslint-enable no-unused-vars */
 import Config from './model/Config';
+
 import Presences from './model/Presences';
 import TemperaturesHeatmap from './model/TemperaturesHeatmap';
 import TemperaturesLegacy from './model/TemperaturesLegacy';

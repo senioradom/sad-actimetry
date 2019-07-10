@@ -1,5 +1,7 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
+import I18n from './I18n';
 
 export default class Presences {
   constructor(config) {
@@ -179,12 +181,10 @@ export default class Presences {
       const sortedRoomsArray = [[], [], [], ['OUTING_']];
 
       this.config.contract.rooms.forEach((room) => {
-
         mapping.idLabel[room.id] = room.label;
         mapping.labelId[room.label] = room.id;
 
         room.sensors.forEach((sensor) => {
-
           switch (sensor.type) {
             case 'motion':
               sortedRoomsArray[0].push(`PRESENCE_${room.label}`);
@@ -281,10 +281,11 @@ export default class Presences {
   }
 
   tooltip(objParam) {
+    // const self = this;
     return `<b>${objParam.roomName}</b><br>
                                 <hr>
                                 ${objParam.start} - ${objParam.end}<br>
-                                <b>Durée :</b> ${objParam.duration}`;
+                                <b>${I18n.strings[this.config.language].duration} :</b> ${objParam.duration}`;
   }
 
   renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
@@ -298,15 +299,15 @@ export default class Presences {
 
     gfxConfig.rooms.forEach((room, index) => {
       if (room.includes('PRESSURE_')) {
-        gfxConfig.rooms[index] = `Lit (${room.replace('PRESSURE_', '')
+        gfxConfig.rooms[index] = `${I18n.strings[this.config.language].bed} (${room.replace('PRESSURE_', '')
           .toLowerCase()})`;
       } else if (room.includes('DOOR_OPENING_')) {
-        gfxConfig.rooms[index] = `Porte (${room.replace('DOOR_OPENING_', '')
+        gfxConfig.rooms[index] = `${I18n.strings[this.config.language].door} (${room.replace('DOOR_OPENING_', '')
           .toLowerCase()})`;
       } else {
         gfxConfig.rooms[index] = room
           .replace('PRESENCE_', '')
-          .replace('OUTING_', 'Sorties');
+          .replace('OUTING_', I18n.strings[this.config.language].outings);
       }
 
       presences.push(
@@ -349,7 +350,7 @@ export default class Presences {
           }
 
           const tooltip = this.tooltip({
-            roomName: (activity.rangeType === 'OUTING') ? 'Sorties' : gfxConfig.roomsMapping.idLabel[activity.room],
+            roomName: (activity.rangeType === 'OUTING') ? I18n.strings[this.config.language].outings : gfxConfig.roomsMapping.idLabel[activity.room],
             start: moment(activity.start)
               .format('HH:mm:ss'),
             end: moment(activity.end)

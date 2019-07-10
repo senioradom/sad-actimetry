@@ -1,5 +1,7 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
+import I18n from './I18n';
 
 export default class PresencesAndSleep {
   constructor(config) {
@@ -106,7 +108,7 @@ export default class PresencesAndSleep {
     });
 
     dataset.push({
-      name: 'Sommeil',
+      name: I18n.strings[this.config.language].sleep,
       type: 'bar',
       xAxisIndex: 1,
       yAxisIndex: 1,
@@ -140,7 +142,7 @@ export default class PresencesAndSleep {
         data: gfxConfig.rooms,
       },
       title: {
-        text: 'Durée du sommeil quotidien',
+        text: I18n.strings[self.config.language].daily_sleep_duration,
         textStyle: {
           color: '#222',
           fontWeight: 'normal',
@@ -170,7 +172,7 @@ export default class PresencesAndSleep {
 
           let htmlTooltip = `<div class="presences-and-sleep-tooltip">
           <p class="header header--activities">
-          <i class="icon-activities"></i> Présences
+          <i class="icon-activities"></i> ${I18n.strings[self.config.language].presences}
           </p>`;
           activites.forEach((item) => {
             htmlTooltip += `<p>${item.seriesName}: <strong>${moment.utc(item.data)
@@ -181,16 +183,16 @@ export default class PresencesAndSleep {
           if (sleep) {
             htmlTooltip += `
             <p class="header header--sleeps">
-            <i class="icon-sleeps"></i> Sommeil
+            <i class="icon-sleeps"></i> ${I18n.strings[self.config.language].sleep}
             </p>
-            <p>Durée : <strong>${moment.utc(moment.duration(sleep.duration)
-    .as('milliseconds'))
-    .format('HH[h]mm')}</strong></p>
-            <p>Heure de coucher : <strong>${moment(sleep.start)
-    .format('HH[h]mm')}</strong></p>
-            <p>Heure de réveil : <strong>${moment(sleep.end)
-    .format('HH[h]mm')}</strong></p>
-            <p>Nombre de levers nocturnes : <strong>${sleep.wakeNumber}</strong></p>
+            <p>${I18n.strings[self.config.language].duration} : <strong>${moment.utc(moment.duration(sleep.duration)
+  .as('milliseconds'))
+  .format('HH[h]mm')}</strong></p>
+            <p>${I18n.strings[self.config.language].bedtime} : <strong>${moment(sleep.start)
+  .format('HH[h]mm')}</strong></p>
+            <p>${I18n.strings[self.config.language].wakeup_time} : <strong>${moment(sleep.end)
+  .format('HH[h]mm')}</strong></p>
+            <p>${I18n.strings[self.config.language].number_of_wakeups_during_the_night} : <strong>${sleep.wakeNumber}</strong></p>
             </div>`;
           }
 

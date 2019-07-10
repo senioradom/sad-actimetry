@@ -4,8 +4,6 @@
   <meta charset="utf-8">
   <title>SAD - Actimetry</title>
   <meta name="description" content=""/>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data.min.js"></script>
 </head>
@@ -36,6 +34,7 @@
 <div id="activities-24h" class="actimetry"></div>
 <p>Week</p>
 <div id="activities-week" class="actimetry"></div>
+
 
 <script>
   var callback = function () {
@@ -68,7 +67,8 @@
     const actimetry = new Actimetry({
       username: 'user@domain.com',
       password: '$passw0rD',
-      contractRef: 'A0000XXX'
+      contractRef: 'A0000XXX',
+      language: 'en',
     });
 
     actimetry.presencesAndSleep.draw('#presences-and-sleep', threeDaysAgoAtEndOfDay, todayAtEndOfDay);

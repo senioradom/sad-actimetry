@@ -1,5 +1,6 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
 
 export default class Activities {
   constructor(config) {

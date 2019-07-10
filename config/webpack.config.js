@@ -5,10 +5,6 @@ const loaders = require('./webpack.loaders');
 const plugins = require('./webpack.plugins');
 
 module.exports = () => ({
-  externals: {
-    echarts: 'echarts',
-    moment: 'moment',
-  },
   context: path.join(config.root, config.paths.src),
   entry: path.join(config.root, config.paths.src, 'javascripts/Actimetry'),
   output: {

@@ -1,5 +1,6 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
 
 export default class TemperaturesHeatmap {
   constructor(config) {
@@ -71,8 +72,8 @@ export default class TemperaturesHeatmap {
         if (Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject, theDate)) {
           gfxConfig.days.push(moment(theDate)
             .tz(self.config.contract.timezone)
-            .locale('fr')
-            .format('dddd DD/MM'));
+            // .locale('fr')
+            .format('dddd DD/MM [==>]'));
 
           Object.keys(temporaryTemperaturesObject[theDate])
             .forEach((hour) => {
@@ -151,65 +152,65 @@ export default class TemperaturesHeatmap {
             label: '< 12',
             color: '#0A2CFF',
           },
-            {
-              lt: 14,
-              gte: 12,
-              label: '12 - 14',
-              color: '#006EFF',
-            },
-            {
-              gte: 14,
-              lt: 16,
-              label: '14 - 16',
-              color: '#3D97FF',
-            },
-            {
-              gte: 16,
-              lt: 18,
-              label: '16 - 18',
-              color: '#72B1FF',
-            },
-            {
-              gte: 18,
-              lt: 20,
-              label: '18 - 20',
-              color: '#21DB9B',
-            },
-            {
-              gte: 20,
-              lt: 22,
-              label: '20 - 22',
-              color: '#00FF00',
-            },
-            {
-              gte: 22,
-              lt: 24,
-              label: '22 - 24',
-              color: '#2EFF00',
-            },
-            {
-              gte: 24,
-              lt: 26,
-              label: '24 - 26',
-              color: '#F2FF00',
-            },
-            {
-              gte: 26,
-              lt: 28,
-              label: '26 - 28',
-              color: '#FF9F00',
-            },
-            {
-              gte: 28,
-              lt: 30,
-              label: '28 - 30',
-              color: '#FF7900',
-            },
-            {
-              gte: 30,
-              label: '>= 30',
-              color: '#FF0000',
-            }],
+          {
+            lt: 14,
+            gte: 12,
+            label: '12 - 14',
+            color: '#006EFF',
+          },
+          {
+            gte: 14,
+            lt: 16,
+            label: '14 - 16',
+            color: '#3D97FF',
+          },
+          {
+            gte: 16,
+            lt: 18,
+            label: '16 - 18',
+            color: '#72B1FF',
+          },
+          {
+            gte: 18,
+            lt: 20,
+            label: '18 - 20',
+            color: '#21DB9B',
+          },
+          {
+            gte: 20,
+            lt: 22,
+            label: '20 - 22',
+            color: '#00FF00',
+          },
+          {
+            gte: 22,
+            lt: 24,
+            label: '22 - 24',
+            color: '#2EFF00',
+          },
+          {
+            gte: 24,
+            lt: 26,
+            label: '24 - 26',
+            color: '#F2FF00',
+          },
+          {
+            gte: 26,
+            lt: 28,
+            label: '26 - 28',
+            color: '#FF9F00',
+          },
+          {
+            gte: 28,
+            lt: 30,
+            label: '28 - 30',
+            color: '#FF7900',
+          },
+          {
+            gte: 30,
+            label: '>= 30',
+            color: '#FF0000',
+          }],
         },
       ],
       series: [{

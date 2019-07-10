@@ -1,5 +1,7 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
+import I18n from './I18n';
 
 export default class MovesPerRoom {
   constructor(config) {
@@ -47,7 +49,7 @@ export default class MovesPerRoom {
 
     Object.keys(movesPerRoom.moves)
       .forEach((theDate) => {
-        const tickCount = movesPerRoom.moves[theDate].forEach(tickCount => {
+        movesPerRoom.moves[theDate].forEach((tickCount) => {
           const label = mappingRoomsIdsToLabels[tickCount.room];
 
           if (!gfxConfig.rooms.includes(label)) {
@@ -56,7 +58,7 @@ export default class MovesPerRoom {
 
           dataset.push(
             [moment(theDate)
-              .format(), tickCount.count, label]
+              .format(), tickCount.count, label],
           );
         });
       });
@@ -85,6 +87,7 @@ export default class MovesPerRoom {
           };
         },
         formatter(params) {
+
           let totalMoves = 0;
           params.forEach((item) => {
             totalMoves += item.data[1];
@@ -92,10 +95,10 @@ export default class MovesPerRoom {
 
           let htmlTooltip = '<div style="color:black;">';
           htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(params[0].data[0])
-            .format('DD/MM/YYYY')} - ${totalMoves} mouvements au total</p>`;
-          htmlTooltip += `<p><strong>${self.numberOfMovesThisMonth} mouvements</strong> en moyenne ce mois-ci</p>`;
+            .format('DD/MM/YYYY')} - ${totalMoves} ${I18n.strings[self.config.language].total_moves}</p>`;
+          htmlTooltip += `<p><strong>${self.numberOfMovesThisMonth} ${I18n.strings[self.config.language].moves}</strong> ${I18n.strings[self.config.language].on_average_this_month}</p>`;
           params.forEach((item) => {
-            const rez = `<p>${item.data[2]}: <strong>${item.data[1]} mouvements</strong></p>`;
+            const rez = `<p>${item.data[2]}: <strong>${item.data[1]} ${I18n.strings[self.config.language].moves}</strong></p>`;
             htmlTooltip += rez;
           });
 

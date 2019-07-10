@@ -1,7 +1,7 @@
 {
   "name": "sad-actimetry",
   "description": "Actimetry SeniorAdom",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "homepage": "http://www.senioradom.com",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.config.js",
@@ -68,8 +68,8 @@
   },
   "dependencies": {
     "echarts": "^4.2.0-rc.2",
-    "moment": "2.22.2",
-    "moment-timezone": "0.5.17"
+    "moment": "~2.18.1",
+    "moment-timezone": "~0.5.13"
   },
   "main": "dist/actimetry.js",
   "repository": {

@@ -1,5 +1,7 @@
-/* global echarts */
-/* global moment */
+import echarts from 'echarts/dist/echarts.min';
+import moment from 'moment';
+import 'moment-timezone';
+import I18n from './I18n';
 
 export default class Outings {
   constructor(config) {
@@ -65,9 +67,9 @@ export default class Outings {
         formatter(outings) {
           let tooltip = '';
           outings[0].data[2].forEach((outing, index) => {
-            tooltip += `<b>Outing #${(index + 1)}</b> : from ${moment(outing.start)
+            tooltip += `<b>${I18n.strings[self.config.language].outing} #${(index + 1)}</b> : ${I18n.strings[self.config.language].from} ${moment(outing.start)
               .tz(self.config.contract.timezone)
-              .format('HH:mm')} to ${moment(outing.end)
+              .format('HH:mm')} ${I18n.strings[self.config.language].to} ${moment(outing.end)
               .tz(self.config.contract.timezone)
               .format('HH:mm')}<br>`;
           });

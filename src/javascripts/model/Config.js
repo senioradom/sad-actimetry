@@ -1,8 +1,10 @@
-/* global sad */
+import moment from 'moment';
+import 'moment-timezone';
 
 export default class Config {
   constructor(settings) {
     this.isReady = false;
+    this.language = 'fr';
 
     this.api = 'https://gateway-v2.senioradom.com';
 
@@ -34,6 +36,15 @@ export default class Config {
 
     if (this.contract) {
       this.isReady = true;
+
+      if (settings.language) {
+        this.language = settings.language;
+      } else if (this.contract.language) {
+        this.language = this.contract.language;
+      }
+
+      moment.locale(this.language);
+
       document.dispatchEvent(new CustomEvent('actimetryIsReady'));
     } else {
       throw new Error('No contract...');
