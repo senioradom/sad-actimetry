@@ -79,6 +79,8 @@ export default class Fixtures {
       },
       grid: {
         top: '2%',
+        y: 0,
+        y2: 75,
       },
       series: [{
         type: 'line',
