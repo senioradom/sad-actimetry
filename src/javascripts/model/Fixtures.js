@@ -6,6 +6,16 @@ export default class Fixtures {
   }
 
   draw(element) {
+    if (this.config.isReady) {
+      this.draw2(element);
+    } else {
+      document.addEventListener('actimetryIsReady', () => {
+        this.draw2(element);
+      }, { once: true });
+    }
+  }
+
+  draw2(element) {
     const myChart = echarts.init(document.querySelector(element));
 
     this.option = {
@@ -44,9 +54,9 @@ export default class Fixtures {
         orient: 'horizontal',
         x: 'center',
         y: 'bottom',
-        padding: 10,
+        padding: 5,
+        itemGap: 5,
         icon: 'bar',
-        itemGap: 20,
         data: [
           'Pièce 1', 'Pièce 2', 'Pièce 3', 'Pièce 4', 'Pièce 5', 'Pièce 6', 'Pièce 7', 'Pièce 8',
         ],
@@ -68,7 +78,7 @@ export default class Fixtures {
         type: 'category',
       },
       grid: {
-        top: '1%',
+        top: '2%',
       },
       series: [{
         type: 'line',
