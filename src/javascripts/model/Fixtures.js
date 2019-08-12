@@ -48,25 +48,49 @@ export default class Fixtures {
         icon: 'bar',
         itemGap: 20,
         data: [
-          'Bureau', 'Cuisine', 'Salle de bain', 'Sorties',
+          'Pièce 1', 'Pièce 2', 'Pièce 3', 'Pièce 4', 'Pièce 5', 'Pièce 6', 'Pièce 7', 'Pièce 8',
         ],
       },
       dataset: {
         source: [
-          ['Room', '2019-08-01', '2019-08-02', '2019-08-03', '2019-08-04', '2019-08-05', '2019-08-06'],
-          ['Bureau', 3, 4, 2, 2, 2.5, 3],
-          ['Cuisine', 6, 6.5, 4, 5, 6.5, 6],
-          ['Salle de bain', 4, 4, 4.5, 3.5, 2, 2.5],
-          ['Sorties', 1, 6, 2, 1, 0, 5],
+          ['Room', '2019-08-01', '2019-08-02', '2019-08-03', '2019-08-04', '2019-08-05', '2019-08-06', '2019-08-07'],
+          ['Pièce 1', 10, 3, 6, 9, 10, 10, 12],
+          ['Pièce 2', 11, 6, 8, 5, 12, 7, 4],
+          ['Pièce 3', 9, 10, 9, 10, 1, 3, 9],
+          ['Pièce 4', 4, 10, 3, 5, 8, 3, 2],
+          ['Pièce 5', 3, 9, 12, 2, 4, 12, 1],
+          ['Pièce 6', 0, 6, 7, 3, 5, 3, 6],
+          ['Pièce 7', 0, 4, 0, 3, 12, 12, 8],
+          ['Pièce 8', 4, 4, 10, 2, 3, 5, 12],
         ],
       },
       xAxis: {
         type: 'category',
       },
       grid: {
-        top: '0%',
+        top: '1%',
       },
       series: [{
+        type: 'line',
+        smooth: true,
+        seriesLayoutBy: 'row',
+      },
+      {
+        type: 'line',
+        smooth: true,
+        seriesLayoutBy: 'row',
+      },
+      {
+        type: 'line',
+        smooth: true,
+        seriesLayoutBy: 'row',
+      },
+      {
+        type: 'line',
+        smooth: true,
+        seriesLayoutBy: 'row',
+      },
+      {
         type: 'line',
         smooth: true,
         seriesLayoutBy: 'row',
