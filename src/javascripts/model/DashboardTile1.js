@@ -78,6 +78,7 @@ export default class DashboardTile1 {
         type: 'line',
         data: rawDataset[roomId],
         smooth: true,
+        showSymbol: false,
         lineStyle: {
           normal: {
             opacity: 0.5,
