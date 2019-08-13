@@ -32,70 +32,13 @@ export default class DashboardTile1 {
 
     const activitiesPerRoom = await response.json();
 
-    this.initDataset(activitiesPerRoom, element);
+    this.checkForData(activitiesPerRoom, element);
   }
 
-  initDataset(activitiesPerRoom, element) {
+  checkForData(activitiesPerRoom, element) {
     const hasActivities = Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
-
     if (hasActivities) {
-      const self = this;
-
-      const roomIds = [];
-
-      const gfxConfig = {
-        rooms: [],
-        xAxis: [],
-        tooltips: {},
-      };
-
-      const rawDataset = [];
-
-      Object.keys(activitiesPerRoom)
-        .forEach((theDate) => {
-          gfxConfig.xAxis.push(theDate);
-
-          if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
-            activitiesPerRoom[theDate].rooms.forEach((presence) => {
-              if (roomIds.indexOf(presence.room) === -1) {
-                roomIds.push(presence.room);
-              }
-
-              if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
-                rawDataset[presence.room] = [];
-              }
-
-              rawDataset[presence.room]
-                .push(
-                  moment.duration(presence.duration)
-                    .valueOf(),
-                );
-            });
-          }
-        });
-
-      roomIds.sort();
-
-      const dataset = [];
-      roomIds.forEach((roomId) => {
-        const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
-        gfxConfig.rooms.push(roomLabel);
-
-        dataset.push({
-          name: roomLabel,
-          type: 'line',
-          data: rawDataset[roomId],
-          smooth: true,
-          showSymbol: false,
-          lineStyle: {
-            normal: {
-              opacity: 0.5,
-            },
-          },
-        });
-      });
-
-      this.setOptions(dataset, gfxConfig, element);
+      this.initDataset(activitiesPerRoom, element);
     } else {
       document.querySelector(element)
         .classList
@@ -103,6 +46,66 @@ export default class DashboardTile1 {
 
       document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
     }
+  }
+
+  initDataset(activitiesPerRoom, element) {
+    const self = this;
+
+    const roomIds = [];
+
+    const gfxConfig = {
+      rooms: [],
+      xAxis: [],
+      tooltips: {},
+    };
+
+    const rawDataset = [];
+
+    Object.keys(activitiesPerRoom)
+      .forEach((theDate) => {
+        gfxConfig.xAxis.push(theDate);
+
+        if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
+          activitiesPerRoom[theDate].rooms.forEach((presence) => {
+            if (roomIds.indexOf(presence.room) === -1) {
+              roomIds.push(presence.room);
+            }
+
+            if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
+              rawDataset[presence.room] = [];
+            }
+
+            rawDataset[presence.room]
+              .push(
+                moment.duration(presence.duration)
+                  .valueOf(),
+              );
+          });
+        }
+      });
+
+    roomIds.sort();
+
+    const dataset = [];
+    roomIds.forEach((roomId) => {
+      const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
+      gfxConfig.rooms.push(roomLabel);
+
+      dataset.push({
+        name: roomLabel,
+        type: 'line',
+        data: rawDataset[roomId],
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            opacity: 0.5,
+          },
+        },
+      });
+    });
+
+    this.setOptions(dataset, gfxConfig, element);
   }
 
   setOptions(dataset, gfxConfig, element) {
