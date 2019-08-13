@@ -27,6 +27,7 @@ class I18n {
         wakeup_time2: 'Heure de levé',
         wakeup_time: 'Heure de réveil',
         wokeup_at: 'S\'est levé(e) à',
+        no_data: 'Il n’y a pas de donnée pour la période concernée.',
       },
       en: {
         averages: 'Average of',
@@ -54,6 +55,7 @@ class I18n {
         wakeup_time2: 'Wake up time',
         wakeup_time: 'Wake up time',
         wokeup_at: 'Woke up at',
+        no_data: 'There is no data for the given period.',
       },
       es: {
         averages: 'promedios de los',
@@ -81,6 +83,7 @@ class I18n {
         wakeup_time2: 'Tiempo de despertar',
         wakeup_time: 'Tiempo de despertar',
         wokeup_at: 'se levantó para',
+        no_data: 'No hay datos para el período dado.',
       },
     };
   }

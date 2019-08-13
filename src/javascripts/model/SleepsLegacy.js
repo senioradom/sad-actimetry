@@ -19,6 +19,10 @@ export default class SleepsLegacy {
   }
 
   async fetchAndDraw(element, start, end) {
+    document.querySelector(element)
+      .classList
+      .add('loading');
+
     const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
@@ -115,6 +119,10 @@ export default class SleepsLegacy {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+
+      document.querySelector(element)
+        .classList
+        .remove('loading');
     }
   }
 }

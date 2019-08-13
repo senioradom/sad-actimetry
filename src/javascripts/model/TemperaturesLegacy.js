@@ -18,6 +18,10 @@ export default class TemperaturesLegacy {
   }
 
   async fetchAndDraw(element, type, start, end) {
+    document.querySelector(element)
+      .classList
+      .add('loading');
+
     const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
@@ -122,6 +126,10 @@ export default class TemperaturesLegacy {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+
+      document.querySelector(element)
+        .classList
+        .remove('loading');
     }
   }
 }

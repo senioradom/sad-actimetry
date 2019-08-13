@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
+import I18n from './I18n';
 
 export default class DashboardTile1 {
   constructor(config) {
@@ -18,6 +19,10 @@ export default class DashboardTile1 {
   }
 
   async fetchAndDraw(element, start, end) {
+    document.querySelector(element)
+      .classList
+      .add('loading');
+
     const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this.config.credentials}`,
@@ -31,63 +36,73 @@ export default class DashboardTile1 {
   }
 
   initDataset(activitiesPerRoom, element) {
-    const self = this;
+    const hasActivities = Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
 
-    const roomIds = [];
+    if (hasActivities) {
+      const self = this;
 
-    const gfxConfig = {
-      rooms: [],
-      xAxis: [],
-      tooltips: {},
-    };
+      const roomIds = [];
 
-    const rawDataset = [];
+      const gfxConfig = {
+        rooms: [],
+        xAxis: [],
+        tooltips: {},
+      };
 
-    Object.keys(activitiesPerRoom)
-      .forEach((theDate) => {
-        gfxConfig.xAxis.push(theDate);
+      const rawDataset = [];
 
-        if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
-          activitiesPerRoom[theDate].rooms.forEach((presence) => {
-            if (roomIds.indexOf(presence.room) === -1) {
-              roomIds.push(presence.room);
-            }
+      Object.keys(activitiesPerRoom)
+        .forEach((theDate) => {
+          gfxConfig.xAxis.push(theDate);
 
-            if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
-              rawDataset[presence.room] = [];
-            }
+          if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
+            activitiesPerRoom[theDate].rooms.forEach((presence) => {
+              if (roomIds.indexOf(presence.room) === -1) {
+                roomIds.push(presence.room);
+              }
 
-            rawDataset[presence.room]
-              .push(
-                moment.duration(presence.duration)
-                  .valueOf(),
-              );
-          });
-        }
-      });
+              if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
+                rawDataset[presence.room] = [];
+              }
 
-    roomIds.sort();
+              rawDataset[presence.room]
+                .push(
+                  moment.duration(presence.duration)
+                    .valueOf(),
+                );
+            });
+          }
+        });
 
-    const dataset = [];
-    roomIds.forEach((roomId) => {
-      const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
-      gfxConfig.rooms.push(roomLabel);
+      roomIds.sort();
 
-      dataset.push({
-        name: roomLabel,
-        type: 'line',
-        data: rawDataset[roomId],
-        smooth: true,
-        showSymbol: false,
-        lineStyle: {
-          normal: {
-            opacity: 0.5,
+      const dataset = [];
+      roomIds.forEach((roomId) => {
+        const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
+        gfxConfig.rooms.push(roomLabel);
+
+        dataset.push({
+          name: roomLabel,
+          type: 'line',
+          data: rawDataset[roomId],
+          smooth: true,
+          showSymbol: false,
+          lineStyle: {
+            normal: {
+              opacity: 0.5,
+            },
           },
-        },
+        });
       });
-    });
 
-    this.setOptions(dataset, gfxConfig, element);
+      this.setOptions(dataset, gfxConfig, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   setOptions(dataset, gfxConfig, element) {
@@ -163,6 +178,7 @@ export default class DashboardTile1 {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+
       document.querySelector(element)
         .classList
         .remove('loading');

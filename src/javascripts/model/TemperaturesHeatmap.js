@@ -237,6 +237,7 @@ export default class TemperaturesHeatmap {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+
       document.querySelector(element)
         .classList
         .remove('loading');

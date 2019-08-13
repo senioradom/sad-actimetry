@@ -19,6 +19,10 @@ export default class Sleeps {
   }
 
   async fetchAndDraw(element, start, end) {
+    document.querySelector(element)
+      .classList
+      .add('loading');
+
     // @todo : Plug to real data
     // const response = await fetch(`${this.config.api.actimetry}/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
     //   headers: {
@@ -156,6 +160,7 @@ export default class Sleeps {
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
+
       document.querySelector(element)
         .classList
         .remove('loading');
