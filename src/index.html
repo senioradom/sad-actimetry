@@ -38,6 +38,9 @@
 <p>Week</p>
 <div id="activities-week" class="actimetry"></div>
 
+<h2>DashboardTile1</h2>
+<div id="dashboardTile1" class="actimetry"></div>
+
 <h2>Fixtures</h2>
 <div id="fixtures" class="actimetry"></div>
 
@@ -93,6 +96,8 @@
     actimetry.activities.draw('#activities-week', oneWeekAgo, now);
 
     actimetry.fixtures.draw('#fixtures');
+
+    actimetry.dashboardTile1.draw('#dashboardTile1', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
   };
 
   document.addEventListener('DOMContentLoaded', function () {

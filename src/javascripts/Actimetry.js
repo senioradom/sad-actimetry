@@ -12,9 +12,10 @@ import Activities from './model/Activities';
 import PresencesAndSleep from './model/PresencesAndSleep';
 import MovesPerRoom from './model/MovesPerRoom';
 import Sleeps from './model/Sleeps';
+import DashboardTile1 from './model/DashboardTile1';
+import Fixtures from './model/Fixtures';
 
 import '../stylesheets/styles.scss';
-import Fixtures from './model/Fixtures';
 
 export default class Actimetry {
   constructor(settings) {
@@ -29,5 +30,6 @@ export default class Actimetry {
     this.movesPerRoom = new MovesPerRoom(this.config);
     this.sleeps = new Sleeps(this.config);
     this.fixtures = new Fixtures(this.config);
+    this.dashboardTile1 = new DashboardTile1(this.config);
   }
 }
