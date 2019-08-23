@@ -39,13 +39,33 @@ export default class MovesPerRoom {
     const self = this;
 
     const gfxConfig = {
-      colors: ['#b5aa9a', '#54c49f', '#7186d4', '#a782c8', '#ffb449', '#ffe343', '#a4e469', '#e49b6c', '#e46e91', '#6ccfe3'],
+      colors: [
+        '#2f4f4f',
+        '#228b22',
+        '#00008b',
+        '#b03060',
+        '#ff4500',
+        '#ffff00',
+        '#00ff00',
+        '#00ffff',
+        '#ff00ff',
+        '#ffdead',
+        '#006400',
+        '#00008b',
+        '#b03060',
+        '#ff4500',
+        '#ffff00',
+        '#deb887',
+        '#00ff00',
+        '#00ffff',
+        '#ff00ff',
+        '#6495ed',
+      ],
       rooms: [],
     };
 
     const mappingRoomsIdsToLabels = Object.assign(...Object.entries(self.config.contract.rooms)
       .map(([, v]) => ({ [v.id]: v.label })));
-
 
     this.numberOfMovesThisMonth = movesPerRoom.monthAverage;
 
@@ -77,6 +97,9 @@ export default class MovesPerRoom {
 
     this.option = {
       color: gfxConfig.colors,
+      grid: {
+        left: '0%',
+      },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
@@ -91,6 +114,7 @@ export default class MovesPerRoom {
           };
         },
         formatter(params) {
+          const beneficiary = self.config.contract.persons.filter(p => p.roles.indexOf('beneficiary') > -1);
 
           let totalMoves = 0;
           params.forEach((item) => {
@@ -100,7 +124,8 @@ export default class MovesPerRoom {
           let htmlTooltip = '<div style="color:black;">';
           htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(params[0].data[0])
             .format('DD/MM/YYYY')} - ${totalMoves} ${I18n.strings[self.config.language].total_moves}</p>`;
-          htmlTooltip += `<p><strong>${self.numberOfMovesThisMonth} ${I18n.strings[self.config.language].moves}</strong> ${I18n.strings[self.config.language].on_average_this_month}</p>`;
+          htmlTooltip += `<p>${I18n.strings[self.config.language].this_month} ${beneficiary.length ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}` : ''} ${I18n.strings[self.config.language].was_detected} <strong>${self.numberOfMovesThisMonth}</strong> ${I18n.strings[self.config.language].times_2}.</p>`;
+
           params.forEach((item) => {
             const rez = `<p>${item.data[2]}: <strong>${item.data[1]} ${I18n.strings[self.config.language].moves}</strong></p>`;
             htmlTooltip += rez;
@@ -114,10 +139,10 @@ export default class MovesPerRoom {
 
       legend: {
         orient: 'horizontal',
-        bottom: 0,
-        left: 'center',
-        padding: 10,
-        itemGap: 20,
+        x: 'center',
+        y: 'bottom',
+        padding: 5,
+        itemGap: 5,
         icon: 'bar',
         data: gfxConfig.rooms,
       },
@@ -125,7 +150,7 @@ export default class MovesPerRoom {
       singleAxis: {
         top: 50,
         bottom: 100,
-        left: 100,
+        left: 0,
         axisLabel: {
           formatter(theDate) {
             return moment(theDate)
@@ -156,6 +181,7 @@ export default class MovesPerRoom {
             formatter(v) {
               return `{customStyle|${v.value[2]}}`;
             },
+            show: false,
             position: 'right',
             align: 'right',
             rich: {

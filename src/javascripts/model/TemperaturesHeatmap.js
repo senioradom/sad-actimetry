@@ -100,14 +100,25 @@ export default class TemperaturesHeatmap {
 
   setOptions(dataset, gfxConfig, element) {
     const myChart = echarts.init(document.querySelector(element));
+    const width = document.defaultView.innerWidth;
+
+    let gridLeft = '15%';
+    let zoomLevel = 100;
+
+    if (width <= 360) {
+      gridLeft = '27%';
+      zoomLevel = 20;
+    } else if (width <= 768) {
+      zoomLevel = 50;
+    }
 
     this.option = {
       tooltip: {
-        position: 'top',
-        formatter: value => `${value.marker}${value.data[2]}°C`,
+        show: false,
       },
       animation: false,
       grid: {
+        left: gridLeft,
         height: '70%',
         y: '0%',
       },
@@ -125,6 +136,33 @@ export default class TemperaturesHeatmap {
           show: true,
         },
       },
+      dataZoom: [
+        {
+          type: 'slider',
+          filterMode: 'weakFilter',
+          showDataShadow: false,
+          bottom: 20,
+          height: 10,
+          borderColor: 'transparent',
+          backgroundColor: '#e2e2e2',
+          handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+          handleSize: 20,
+          handleStyle: {
+            shadowBlur: 6,
+            shadowOffsetX: 1,
+            shadowOffsetY: 2,
+            shadowColor: '#aaa',
+          },
+          labelFormatter: '',
+          start: 0,
+          end: zoomLevel,
+        },
+        {
+          type: 'inside',
+          start: 0,
+          end: zoomLevel,
+        },
+      ],
       visualMap: [
         {
           min: 12,

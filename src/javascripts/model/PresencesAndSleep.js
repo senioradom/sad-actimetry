@@ -134,14 +134,38 @@ export default class PresencesAndSleep {
     self.tooltips = gfxConfig.tooltips;
 
     this.option = {
+      color: [
+        '#2f4f4f',
+        '#228b22',
+        '#00008b',
+        '#b03060',
+        '#ff4500',
+        '#ffff00',
+        '#00ff00',
+        '#00ffff',
+        '#ff00ff',
+        '#ffdead',
+        '#006400',
+        '#00008b',
+        '#b03060',
+        '#ff4500',
+        '#ffff00',
+        '#deb887',
+        '#00ff00',
+        '#00ffff',
+        '#ff00ff',
+        '#6495ed',
+      ],
+
       backgroundColor: '#fff',
+
       animation: false,
       legend: {
         orient: 'horizontal',
-        bottom: 0,
-        left: 'center',
-        padding: [0, 0, 0, 0],
-        itemGap: 20,
+        x: 'center',
+        y: 'bottom',
+        padding: 5,
+        itemGap: 5,
         icon: 'bar',
         data: gfxConfig.rooms,
       },
@@ -222,7 +246,7 @@ export default class PresencesAndSleep {
         right: '0%',
         top: '80%',
         width: '90%',
-        height: '15%',
+        height: '10%',
       },
       ],
       xAxis: [{

@@ -56,6 +56,14 @@ export default class Presences {
     const self = this;
     this.chart = echarts.init(document.querySelector(element));
 
+    const width = document.defaultView.innerWidth;
+
+    let gridLeft = '15%';
+
+    if (width <= 360) {
+      gridLeft = '27%';
+    }
+
     function renderItem(params, api) {
       const heightRatio = api.value(3) === 'MASK' ? 1 : 0.6;
 
@@ -122,7 +130,7 @@ export default class Presences {
       ],
 
       grid: {
-        left: '15%',
+        left: gridLeft,
         height: 300,
       },
       xAxis: {
