@@ -4,7 +4,7 @@ const glob = require('glob');
 const path = require('path');
 
 const WebpackBar = require('webpackbar');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -42,9 +42,7 @@ const optimizeCss = new OptimizeCssAssetsPlugin({
 });
 
 // Clean webpack
-const clean = new CleanWebpackPlugin(['dist'], {
-  root: config.root,
-});
+const clean = new CleanWebpackPlugin();
 
 // Stylelint
 const stylelint = new StyleLintPlugin();

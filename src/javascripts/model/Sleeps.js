@@ -8,17 +8,17 @@ export default class Sleeps {
     this.config = config;
   }
 
-  draw(element, start, end) {
+  draw(element) {
     if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+      this.fetchAndDraw(element);
     } else {
       document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
+        this.fetchAndDraw(element);
       }, { once: true });
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  async fetchAndDraw(element) {
     document.querySelector(element)
       .classList
       .add('loading');

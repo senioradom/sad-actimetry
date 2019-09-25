@@ -6,7 +6,7 @@ const plugins = require('./webpack.plugins');
 
 module.exports = () => ({
   context: path.join(config.root, config.paths.src),
-  entry: path.join(config.root, config.paths.src, 'javascripts/Actimetry'),
+  entry: ['@babel/polyfill', './javascripts/Actimetry.js'],
   output: {
     library: 'Actimetry',
     libraryExport: 'default',
@@ -18,7 +18,11 @@ module.exports = () => ({
   mode: ['production', 'development'].includes(config.env)
     ? config.env
     : 'development',
-  devtool: 'cheap-eval-source-map',
+
+  // Crashes IE 11
+  // devtool: 'cheap-eval-source-map',
+  devtool: 'none',
+
   devServer: {
     contentBase: path.join(config.root, config.paths.src),
     watchContentBase: true,
@@ -26,6 +30,10 @@ module.exports = () => ({
     open: true,
     port: config.port,
     host: config.dev_host,
+  },
+  externals: {
+    echarts: 'echarts',
+    moment: 'moment',
   },
   module: {
     rules: loaders,

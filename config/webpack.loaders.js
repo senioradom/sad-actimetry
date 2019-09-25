@@ -10,19 +10,36 @@ const html = {
   use: [
     {
       loader: 'html-loader',
+      options: {
+        interpolate: true,
+      },
     },
   ],
 };
 
 // Javascript loaders
 const js = {
-  test: /\.js(x)$/,
+  test: /\.js(x)?$/,
   exclude: /node_modules/,
   use: [
     {
       loader: 'babel-loader',
       options: {
-        presets: ['@babel/preset-env'],
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              targets: {
+                node: true,
+                browsers: [
+                  '> 1%',
+                  'Firefox >= 52', // last ESR
+                  'IE 11',
+                ],
+              },
+            },
+          ],
+        ],
       },
     },
     'eslint-loader',
@@ -32,9 +49,6 @@ const js = {
 // Style loaders
 const styleLoader = {
   loader: 'style-loader',
-  options: {
-    sourceMap,
-  },
 };
 
 const cssLoader = {
@@ -78,21 +92,6 @@ const sass = {
   ],
 };
 
-const less = {
-  test: /\.less$/,
-  use: [
-    config.env === 'production' ? MiniCssExtractPlugin.loader : styleLoader,
-    cssLoader,
-    postcssLoader,
-    {
-      loader: 'less-loader',
-      options: {
-        sourceMap,
-      },
-    },
-  ],
-};
-
 // Image loaders
 const imageLoader = {
   loader: 'image-webpack-loader',
@@ -116,32 +115,34 @@ const imageLoader = {
 
 const images = {
   test: /\.(gif|png|jpe?g|svg)$/i,
+  exclude: /fonts/,
   use: [
-    'file-loader?name=images/[name].[ext]?[hash]',
+    'file-loader?name=images/[name].[hash].[ext]',
     config.env === 'production' ? imageLoader : null,
   ].filter(Boolean),
 };
 
 // Font loaders
 const fonts = {
-  test: /\.(woff|woff2|eot|ttf|otf)$/,
+  test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+  exclude: /images/,
   use: [
     {
       loader: 'file-loader',
       query: {
-        name: '[name].[ext]',
+        name: '[name].[hash].[ext]',
         outputPath: 'fonts/',
       },
     },
   ],
 };
 
+
 module.exports = [
   html,
   js,
   css,
   sass,
-  less,
   images,
   fonts,
 ];

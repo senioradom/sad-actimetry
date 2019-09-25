@@ -95,7 +95,7 @@ export default class PresencesAndSleep {
 
     const dataset = [];
     roomIds.forEach((roomId) => {
-      const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
+      const roomLabel = self.config.contract.rooms.filter((room) => room.id === roomId)[0].label;
       gfxConfig.rooms.push(roomLabel);
 
       dataset.push({
@@ -193,8 +193,8 @@ export default class PresencesAndSleep {
           };
         },
         formatter(params) {
-          const activites = params.filter(serie => serie.seriesType === 'line');
-          let sleep = params.filter(serie => serie.seriesType === 'bar');
+          const activites = params.filter((serie) => serie.seriesType === 'line');
+          let sleep = params.filter((serie) => serie.seriesType === 'bar');
 
           sleep = self.tooltips[sleep[0].axisValue];
 

@@ -88,7 +88,7 @@ export default class DashboardTile1 {
 
     const dataset = [];
     roomIds.forEach((roomId) => {
-      const roomLabel = self.config.contract.rooms.filter(room => room.id === roomId)[0].label;
+      const roomLabel = self.config.contract.rooms.filter((room) => room.id === roomId)[0].label;
       gfxConfig.rooms.push(roomLabel);
 
       dataset.push({

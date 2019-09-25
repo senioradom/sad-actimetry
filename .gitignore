@@ -39,3 +39,5 @@ $RECYCLE.BIN/
 .dev
 /yarn.lock
 /package-lock.json
+bower_components/
+.csscomb.json

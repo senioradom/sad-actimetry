@@ -114,7 +114,7 @@ export default class MovesPerRoom {
           };
         },
         formatter(params) {
-          const beneficiary = self.config.contract.persons.filter(p => p.roles.indexOf('beneficiary') > -1);
+          const beneficiary = self.config.contract.persons.filter((p) => p.roles.indexOf('beneficiary') > -1);
 
           let totalMoves = 0;
           params.forEach((item) => {

@@ -21,6 +21,8 @@ const API = {
 const config = () => ({
   api: API[process.env.NODE_ENV],
 
+  dev_host: '192.168.0.10', // 0.0.0.0, 'localhost'
+
   port: process.env.PORT || 9001,
 
   env: process.env.NODE_ENV,

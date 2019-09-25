@@ -1,3 +1,8 @@
+// IE 11 Polyfills not provided by core-js
+import 'url-polyfill';
+import 'isomorphic-fetch';
+import 'custom-event-polyfill';
+
 /* eslint-disable no-unused-vars */
 import I18n from './model/I18n';
 /* eslint-enable no-unused-vars */

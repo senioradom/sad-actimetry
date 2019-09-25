@@ -89,7 +89,7 @@ export default class TemperaturesHeatmap {
     // 0 : Day
     // 1 : Hour
     // 2 : Temperature
-    dataset = dataset.map(item => [item[1], item[0], item[2]]);
+    dataset = dataset.map((item) => [item[1], item[0], item[2]]);
 
     for (let hour = 0; hour <= 23; hour += 1) {
       gfxConfig.hours.push(`${hour}h`);
