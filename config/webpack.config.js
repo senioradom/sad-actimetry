@@ -31,10 +31,6 @@ module.exports = () => ({
     port: config.port,
     host: config.dev_host,
   },
-  externals: {
-    echarts: 'echarts',
-    moment: 'moment',
-  },
   module: {
     rules: loaders,
   },
