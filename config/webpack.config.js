@@ -6,7 +6,7 @@ const plugins = require('./webpack.plugins');
 
 module.exports = () => ({
   context: path.join(config.root, config.paths.src),
-  entry: ['@babel/polyfill', './javascripts/Actimetry.js'],
+  entry: ['@babel/polyfill/noConflict', './javascripts/Actimetry.js'],
   output: {
     library: 'Actimetry',
     libraryExport: 'default',
