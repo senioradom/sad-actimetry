@@ -31,7 +31,21 @@ export default class Presences {
     });
 
     const ranges = await response.json();
-    this.initDataset(ranges, element);
+
+    this.checkForData(ranges, element);
+  }
+
+  checkForData(ranges, element) {
+    const hasActivities = Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(ranges, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(ranges, element) {

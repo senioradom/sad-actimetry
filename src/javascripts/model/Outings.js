@@ -32,7 +32,20 @@ export default class Outings {
 
     const outings = await response.json();
 
-    this.initDataset(outings, element);
+    this.checkForData(outings, element);
+  }
+
+  checkForData(outings, element) {
+    const hasActivities = Object.values(outings).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(outings, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(outings, element) {

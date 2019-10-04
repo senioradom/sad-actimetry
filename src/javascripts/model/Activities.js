@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
+import I18n from './I18n';
 
 export default class Activities {
   constructor(config) {
@@ -30,7 +31,21 @@ export default class Activities {
     });
 
     const activities = await response.json();
-    this.initDataset(activities, element);
+
+    this.checkForData(activities, element);
+  }
+
+  checkForData(activities, element) {
+    const hasActivities = activities.length > 0;
+    if (hasActivities) {
+      this.initDataset(activities, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(activities, element) {

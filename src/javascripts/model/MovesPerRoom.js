@@ -32,7 +32,20 @@ export default class MovesPerRoom {
 
     const movesPerRoom = await response.json();
 
-    this.initDataset(movesPerRoom, element);
+    this.checkForData(movesPerRoom, element);
+  }
+
+  checkForData(movesPerRoom, element) {
+    const hasActivities = Object.values(movesPerRoom.moves).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(movesPerRoom, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(movesPerRoom, element) {

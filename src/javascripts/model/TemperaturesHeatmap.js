@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
+import I18n from './I18n';
 
 export default class TemperaturesHeatmap {
   constructor(config) {
@@ -31,7 +32,20 @@ export default class TemperaturesHeatmap {
 
     const temperatures = await response.json();
 
-    this.initDataset(temperatures, element);
+    this.checkForData(temperatures, element);
+  }
+
+  checkForData(temperatures, element) {
+    const hasActivities = Object.values(temperatures).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(temperatures, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(temperatures, element) {

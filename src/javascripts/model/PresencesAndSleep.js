@@ -32,7 +32,20 @@ export default class PresencesAndSleep {
 
     const roomsAndSleeps = await response.json();
 
-    this.initDataset(roomsAndSleeps, element);
+    this.checkForData(roomsAndSleeps, element);
+  }
+
+  checkForData(roomsAndSleeps, element) {
+    const hasActivities = Object.values(roomsAndSleeps).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(roomsAndSleeps, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(roomsAndSleeps, element) {

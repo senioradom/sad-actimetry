@@ -31,7 +31,21 @@ export default class SleepsLegacy {
     });
 
     const sleeps = await response.json();
-    this.initDataset(sleeps, element);
+
+    this.checkForData(sleeps, element);
+  }
+
+  checkForData(sleeps, element) {
+    const hasActivities = Object.values(sleeps).reduce((total, currentObj) => total + currentObj.details.length, 0) > 0;
+    if (hasActivities) {
+      this.initDataset(sleeps, element);
+    } else {
+      document.querySelector(element)
+        .classList
+        .remove('loading');
+
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+    }
   }
 
   initDataset(sleeps, element) {
