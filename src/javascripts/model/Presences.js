@@ -382,6 +382,12 @@ export default class Presences {
               .format('HH:mm:ss'),
           });
 
+          if (['DOOR_OPENING'].includes(activity.rangeType)) {
+            if (moment.duration(activity.duration).valueOf() < 60 * 1000) {
+              ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart).add(60, 'seconds').utc().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            }
+          }
+
           presences.push(
             this.hydrate({
               roomName: gfxConfig.roomsMapping.idLabel[activity.room],
