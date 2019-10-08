@@ -8,17 +8,17 @@ export default class Presences {
     this.config = config;
   }
 
-  draw(element, start, end) {
+  draw(element, start, end, callback) {
     if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+      this.fetchAndDraw(element, start, end, callback);
     } else {
       document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
+        this.fetchAndDraw(element, start, end, callback);
       }, { once: true });
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  async fetchAndDraw(element, start, end, callback) {
     document.querySelector(element)
       .classList
       .add('loading');
@@ -32,23 +32,27 @@ export default class Presences {
 
     const ranges = await response.json();
 
-    this.checkForData(ranges, element);
+    this.checkForData(ranges, element, callback);
   }
 
-  checkForData(ranges, element) {
+  checkForData(ranges, element, callback) {
     const hasActivities = Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
     if (hasActivities) {
-      this.initDataset(ranges, element);
+      this.initDataset(ranges, element, callback);
     } else {
       document.querySelector(element)
         .classList
         .remove('loading');
 
       document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+
+      if (callback && typeof callback === 'function') {
+        callback();
+      }
     }
   }
 
-  initDataset(ranges, element) {
+  initDataset(ranges, element, callback) {
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
       max: Number.MIN_SAFE_INTEGER,
@@ -63,10 +67,10 @@ export default class Presences {
       .valueOf());
     gfxConfig.zoomLevel = this.zoomLevel(gfxConfig.min, gfxConfig.max);
 
-    this.setOptions(dataset, gfxConfig, element);
+    this.setOptions(dataset, gfxConfig, element, callback);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  setOptions(dataset, gfxConfig, element, callback) {
     const self = this;
     this.chart = echarts.init(document.querySelector(element));
 
@@ -186,7 +190,8 @@ export default class Presences {
 
     if (this.option && typeof this.option === 'object') {
       this.chart.setOption(this.option, true);
-      this.initEvents();
+      this.initEvents(callback);
+
       document.querySelector(element)
         .classList
         .remove('loading');
@@ -383,8 +388,12 @@ export default class Presences {
           });
 
           if (['DOOR_OPENING'].includes(activity.rangeType)) {
-            if (moment.duration(activity.duration).valueOf() < 60 * 1000) {
-              ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart).add(60, 'seconds').utc().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            if (moment.duration(activity.duration)
+              .valueOf() < 60 * 1000) {
+              ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart)
+                .add(60, 'seconds')
+                .utc()
+                .format('YYYY-MM-DDTHH:mm:ss.SSSZ');
             }
           }
 
@@ -410,7 +419,7 @@ export default class Presences {
     return 100 - (100 / ((max - min) / 86400000));
   }
 
-  initEvents() {
+  initEvents(callback) {
     this.chart.on('mousemove', (params) => {
       if (params.name === 'MASK') {
         this.chart.getZr()
@@ -418,6 +427,12 @@ export default class Presences {
       } else {
         this.chart.getZr()
           .setCursorStyle('pointer');
+      }
+    });
+
+    this.chart.on('finished', () => {
+      if (callback && typeof callback === 'function') {
+        callback();
       }
     });
   }
