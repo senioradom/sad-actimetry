@@ -72,6 +72,13 @@ export default class Presences {
 
   setOptions(dataset, gfxConfig, element, callback) {
     const self = this;
+
+    const graphHeight = 35 * gfxConfig.rooms.length;
+
+    document.querySelector(element)
+      .setAttribute('style', `${document.querySelector(element)
+        .getAttribute('style')}; height: ${graphHeight + 140}px;`);
+
     this.chart = echarts.init(document.querySelector(element));
 
     const width = document.defaultView.innerWidth;
@@ -124,7 +131,7 @@ export default class Presences {
           type: 'slider',
           filterMode: 'weakFilter',
           showDataShadow: false,
-          top: 400,
+          top: graphHeight + 100,
           height: 10,
           borderColor: 'transparent',
           backgroundColor: '#e2e2e2',
@@ -149,7 +156,7 @@ export default class Presences {
 
       grid: {
         left: gridLeft,
-        height: 300,
+        height: graphHeight,
       },
       xAxis: {
         min: gfxConfig.min,
