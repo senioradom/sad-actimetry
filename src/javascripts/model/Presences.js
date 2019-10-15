@@ -2,6 +2,7 @@ import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment';
 import 'moment-timezone';
 import I18n from './I18n';
+import StringUtils from '../StringUtils';
 
 export default class Presences {
   constructor(config) {
@@ -54,6 +55,10 @@ export default class Presences {
   }
 
   initDataset(ranges, element, callback) {
+    this.width = document.querySelector(element).offsetWidth;
+    this.windowWidth = document.defaultView.innerWidth;
+    this.isMobile = document.defaultView.innerWidth <= 768;
+
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
       max: Number.MIN_SAFE_INTEGER,
@@ -82,8 +87,7 @@ export default class Presences {
 
     this.chart = echarts.init(document.querySelector(element));
 
-    const width = document.querySelector(element).offsetWidth;
-    const legendsLeftBlock = 140;
+    const legendsLeftBlock = this.isMobile ? 80 : 140;
 
     function renderItem(params, api) {
       const heightRatio = api.value(3) === 'MASK' ? 1 : 0.6;
@@ -152,7 +156,7 @@ export default class Presences {
 
       grid: {
         left: legendsLeftBlock,
-        width: width - legendsLeftBlock - 35,
+        width: this.width - legendsLeftBlock - (this.windowWidth >= 700 ? 35 : 20),
         height: graphHeight,
       },
       xAxis: {
@@ -339,6 +343,10 @@ export default class Presences {
         gfxConfig.rooms[index] = room
           .replace('PRESENCE_', '')
           .replace('OUTING_', I18n.strings[this.config.language].outings);
+      }
+
+      if (this.isMobile) {
+        gfxConfig.rooms[index] = StringUtils.wordWrap(gfxConfig.rooms[index], 12);
       }
 
       presences.push(
