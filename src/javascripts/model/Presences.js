@@ -36,7 +36,8 @@ export default class Presences {
   }
 
   checkForData(ranges, element, callback) {
-    const hasActivities = Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
+    const hasActivities = Object.values(ranges.days)
+      .reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
     if (hasActivities) {
       this.initDataset(ranges, element, callback);
     } else {
@@ -81,13 +82,8 @@ export default class Presences {
 
     this.chart = echarts.init(document.querySelector(element));
 
-    const width = document.defaultView.innerWidth;
-
-    let gridLeft = '15%';
-
-    if (width <= 360) {
-      gridLeft = '27%';
-    }
+    const width = document.querySelector(element).offsetWidth;
+    const legendsLeftBlock = 140;
 
     function renderItem(params, api) {
       const heightRatio = api.value(3) === 'MASK' ? 1 : 0.6;
@@ -155,7 +151,8 @@ export default class Presences {
       ],
 
       grid: {
-        left: gridLeft,
+        left: legendsLeftBlock,
+        width: width - legendsLeftBlock - 35,
         height: graphHeight,
       },
       xAxis: {

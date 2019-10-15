@@ -249,14 +249,12 @@ export default class PresencesAndSleep {
         },
       },
       grid: [{
-        left: '5%',
-        right: '0%',
+        x: 'center',
         height: '60%',
         width: '90%',
       },
       {
-        left: '5%',
-        right: '0%',
+        x: 'center',
         top: '80%',
         width: '90%',
         height: '10%',

@@ -163,7 +163,7 @@ export default class MovesPerRoom {
       singleAxis: {
         top: 50,
         bottom: 100,
-        left: 0,
+        x: 'center',
         axisLabel: {
           formatter(theDate) {
             return moment(theDate)
