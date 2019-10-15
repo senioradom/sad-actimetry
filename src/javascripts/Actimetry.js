@@ -2,6 +2,7 @@
 import 'url-polyfill';
 import 'isomorphic-fetch';
 import 'custom-event-polyfill';
+import { version } from '../../package.json';
 
 /* eslint-disable no-unused-vars */
 import I18n from './model/I18n';
@@ -36,5 +37,7 @@ export default class Actimetry {
     this.sleeps = new Sleeps(this.config);
     this.fixtures = new Fixtures(this.config);
     this.dashboardTile1 = new DashboardTile1(this.config);
+
+    this.version = version;
   }
 }
