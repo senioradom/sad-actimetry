@@ -87,7 +87,7 @@ export default class Presences {
 
     this.chart = echarts.init(document.querySelector(element));
 
-    const legendsLeftBlock = this.isMobile ? 80 : 140;
+    const legendsLeftBlock = this.isMobile ? 80 : 150;
 
     function renderItem(params, api) {
       const heightRatio = api.value(3) === 'MASK' ? 1 : 0.6;
@@ -345,9 +345,7 @@ export default class Presences {
           .replace('OUTING_', I18n.strings[this.config.language].outings);
       }
 
-      if (this.isMobile) {
-        gfxConfig.rooms[index] = StringUtils.wordWrap(gfxConfig.rooms[index], 12);
-      }
+      gfxConfig.rooms[index] = StringUtils.wordWrap(gfxConfig.rooms[index], (this.isMobile) ? 12 : 25);
 
       presences.push(
         this.hydrate({
