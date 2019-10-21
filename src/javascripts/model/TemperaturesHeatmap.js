@@ -49,6 +49,9 @@ export default class TemperaturesHeatmap {
   }
 
   initDataset(temperatures, element) {
+    this.width = document.querySelector(element).offsetWidth;
+    this.isMobile = document.defaultView.innerWidth <= 768;
+
     const self = this;
 
     const gfxConfig = {
@@ -87,7 +90,8 @@ export default class TemperaturesHeatmap {
           gfxConfig.days.push(moment(theDate)
             .tz(self.config.contract.timezone)
             // .locale('fr')
-            .format('dddd DD/MM'));
+            .format(self.isMobile ? 'DD/MM' : 'dddd DD/MM'));
+
 
           Object.keys(temporaryTemperaturesObject[theDate])
             .forEach((hour) => {
@@ -116,11 +120,9 @@ export default class TemperaturesHeatmap {
     const myChart = echarts.init(document.querySelector(element));
     const width = document.defaultView.innerWidth;
 
-    let gridLeft = '15%';
     let zoomLevel = 100;
 
-    if (width <= 360) {
-      gridLeft = '27%';
+    if (width <= 400) {
       zoomLevel = 20;
     } else if (width <= 768) {
       zoomLevel = 50;
@@ -132,9 +134,10 @@ export default class TemperaturesHeatmap {
       },
       animation: false,
       grid: {
-        left: gridLeft,
-        height: '70%',
+        right: 20,
         y: '0%',
+        width: this.width - (this.isMobile ? 60 : 130),
+        height: 500,
       },
       xAxis: {
         type: 'category',
@@ -156,6 +159,7 @@ export default class TemperaturesHeatmap {
           filterMode: 'weakFilter',
           showDataShadow: false,
           bottom: 20,
+          y: 535,
           height: 10,
           borderColor: 'transparent',
           backgroundColor: '#e2e2e2',
@@ -184,7 +188,7 @@ export default class TemperaturesHeatmap {
           calculable: true,
           orient: 'horizontal',
           left: 'center',
-          bottom: '15%',
+          y: 575,
           inRange: {
             color: ['#0A2CFF', '#006EFF', '#3D97FF', '#72B1FF', '#21DB9B', '#00FF00', '#2EFF00', '#F2FF00', '#FF9F00', '#FF7900', '#FF0000'],
           },
