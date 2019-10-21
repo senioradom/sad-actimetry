@@ -56,7 +56,6 @@ export default class Presences {
 
   initDataset(ranges, element, callback) {
     this.width = document.querySelector(element).offsetWidth;
-    this.windowWidth = document.defaultView.innerWidth;
     this.isMobile = document.defaultView.innerWidth <= 768;
 
     const gfxConfig = {
@@ -156,7 +155,7 @@ export default class Presences {
 
       grid: {
         left: legendsLeftBlock,
-        width: this.width - legendsLeftBlock - (this.windowWidth >= 700 ? 35 : 20),
+        width: this.width - legendsLeftBlock - (this.isMobile ? 35 : 20),
         height: graphHeight,
       },
       xAxis: {

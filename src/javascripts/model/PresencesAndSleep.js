@@ -49,6 +49,8 @@ export default class PresencesAndSleep {
   }
 
   initDataset(roomsAndSleeps, element) {
+    this.width = document.querySelector(element).offsetWidth;
+
     const self = this;
 
     const roomIds = [];
@@ -143,6 +145,24 @@ export default class PresencesAndSleep {
   setOptions(dataset, gfxConfig, element) {
     const myChart = echarts.init(document.querySelector(element));
 
+    const coordonates = {
+      width: this.width - 90,
+      linesChart: {
+        y: 10,
+        height: 377,
+      },
+      title: {
+        top: 430,
+      },
+      barsChart: {
+        top: 480,
+        height: 61,
+      },
+      legend: {
+        y: 555,
+      },
+    };
+
     const self = this;
     self.tooltips = gfxConfig.tooltips;
 
@@ -172,11 +192,11 @@ export default class PresencesAndSleep {
 
       backgroundColor: '#fff',
 
-      animation: false,
+      animation: true,
       legend: {
         orient: 'horizontal',
         x: 'center',
-        y: 'bottom',
+        y: coordonates.legend.y,
         padding: 5,
         itemGap: 5,
         icon: 'bar',
@@ -189,8 +209,8 @@ export default class PresencesAndSleep {
           fontWeight: 'normal',
           fontSize: 24,
         },
-        bottom: '21%',
-        left: '4%',
+        top: coordonates.title.top,
+        left: 'center',
       },
       tooltip: {
         trigger: 'axis',
@@ -250,14 +270,15 @@ export default class PresencesAndSleep {
       },
       grid: [{
         x: 'center',
-        height: '60%',
-        width: '90%',
+        y: coordonates.linesChart.y,
+        height: coordonates.linesChart.height,
+        width: coordonates.width,
       },
       {
         x: 'center',
-        top: '80%',
-        width: '90%',
-        height: '10%',
+        top: coordonates.barsChart.top,
+        height: coordonates.barsChart.height,
+        width: coordonates.width,
       },
       ],
       xAxis: [{
