@@ -65,6 +65,6 @@ export default class Config {
   }
 
   _validateLanguage(language) {
-    return ['en', 'fr', 'es', 'sk', 'cn'].includes(language);
+    return ['en', 'fr', 'es', 'sk', 'zh'].includes(language);
   }
 }
