@@ -12,23 +12,28 @@ export default class Activities {
     if (this.config.isReady) {
       this.fetchAndDraw(element, start, end);
     } else {
-      document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
-      }, { once: true });
+      document.addEventListener(
+        'actimetryIsReady',
+        () => {
+          this.fetchAndDraw(element, start, end);
+        },
+        { once: true }
+      );
     }
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element)
-      .classList
-      .add('loading');
+    document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
-      },
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      {
+        headers: {
+          authorization: `Basic ${this.config.credentials}`
+        },
+        method: 'GET'
+      }
+    );
 
     const activities = await response.json();
 
@@ -40,11 +45,13 @@ export default class Activities {
     if (hasActivities) {
       this.initDataset(activities, element);
     } else {
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+      document.querySelector(
+        element
+      ).innerHTML = `<div class="actimetry__no-data">${
+        I18n.strings[this.config.language].no_data
+      }</div>`;
     }
   }
 
@@ -52,17 +59,15 @@ export default class Activities {
     const dataset = [];
     const gfxConfig = {
       min: 0,
-      max: 0,
+      max: 0
     };
 
-    Object.keys(activities)
-      .forEach((theDate) => {
-        Object.keys(activities[theDate])
-          .forEach(() => {
-            gfxConfig.max = Math.max(gfxConfig.max, activities[theDate].value);
-            dataset.push([activities[theDate].start, activities[theDate].value]);
-          });
+    Object.keys(activities).forEach(theDate => {
+      Object.keys(activities[theDate]).forEach(() => {
+        gfxConfig.max = Math.max(gfxConfig.max, activities[theDate].value);
+        dataset.push([activities[theDate].start, activities[theDate].value]);
       });
+    });
 
     this.setOptions(dataset, gfxConfig, element);
   }
@@ -82,11 +87,13 @@ export default class Activities {
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          animation: true,
+          animation: true
         },
         formatter(value) {
-          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${value[0].data[1]}`;
-        },
+          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${
+            value[0].data[1]
+          }`;
+        }
       },
 
       calculable: true,
@@ -96,31 +103,30 @@ export default class Activities {
           boundaryGap: false,
           axisLabel: {
             formatter(value) {
-              return moment(value)
-                .format('DD/MM HH:MM');
-            },
-          },
-        },
+              return moment(value).format('DD/MM HH:MM');
+            }
+          }
+        }
       ],
       yAxis: {
         type: 'value',
         min: parseInt(gfxConfig.min, 10),
         max: parseInt(gfxConfig.max, 10) + 2,
         axisLabel: {
-          formatter: '{value}',
-        },
+          formatter: '{value}'
+        }
       },
       dataZoom: [
         {
           type: 'slider',
           xAxisIndex: 0,
-          filterMode: 'empty',
+          filterMode: 'empty'
         },
         {
           type: 'inside',
           xAxisIndex: 0,
-          filterMode: 'empty',
-        },
+          filterMode: 'empty'
+        }
       ],
       series: [
         {
@@ -128,17 +134,15 @@ export default class Activities {
           name: 'Activities',
           type: 'line',
           smooth: true,
-          data: dataset,
-        },
-      ],
+          data: dataset
+        }
+      ]
     };
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
 
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
     }
   }
 }

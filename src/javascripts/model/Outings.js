@@ -12,23 +12,28 @@ export default class Outings {
     if (this.config.isReady) {
       this.fetchAndDraw(element, start, end);
     } else {
-      document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
-      }, { once: true });
+      document.addEventListener(
+        'actimetryIsReady',
+        () => {
+          this.fetchAndDraw(element, start, end);
+        },
+        { once: true }
+      );
     }
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element)
-      .classList
-      .add('loading');
+    document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
-      },
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      {
+        headers: {
+          authorization: `Basic ${this.config.credentials}`
+        },
+        method: 'GET'
+      }
+    );
 
     const outings = await response.json();
 
@@ -36,15 +41,21 @@ export default class Outings {
   }
 
   checkForData(outings, element) {
-    const hasActivities = Object.values(outings).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
+    const hasActivities =
+      Object.values(outings).reduce(
+        (total, currentObj) => total + currentObj.length,
+        0
+      ) > 0;
     if (hasActivities) {
       this.initDataset(outings, element);
     } else {
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+      document.querySelector(
+        element
+      ).innerHTML = `<div class="actimetry__no-data">${
+        I18n.strings[this.config.language].no_data
+      }</div>`;
     }
   }
 
@@ -52,20 +63,19 @@ export default class Outings {
     const dataset = [];
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
-      max: Number.MIN_SAFE_INTEGER,
+      max: Number.MIN_SAFE_INTEGER
     };
 
-    Object.keys(outings)
-      .forEach((theDate) => {
-        dataset.push([theDate, outings[theDate].length, outings[theDate]]);
+    Object.keys(outings).forEach(theDate => {
+      dataset.push([theDate, outings[theDate].length, outings[theDate]]);
 
-        if (outings[theDate].length < gfxConfig.min) {
-          gfxConfig.min = outings[theDate].length;
-        }
-        if (outings[theDate].length > gfxConfig.max) {
-          gfxConfig.max = outings[theDate].length;
-        }
-      });
+      if (outings[theDate].length < gfxConfig.min) {
+        gfxConfig.min = outings[theDate].length;
+      }
+      if (outings[theDate].length > gfxConfig.max) {
+        gfxConfig.max = outings[theDate].length;
+      }
+    });
 
     this.setOptions(dataset, gfxConfig, element);
   }
@@ -79,20 +89,26 @@ export default class Outings {
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          animation: true,
+          animation: true
         },
         formatter(outings) {
           let tooltip = '';
           outings[0].data[2].forEach((outing, index) => {
-            tooltip += `<b>${I18n.strings[self.config.language].outing} #${(index + 1)}</b> : ${I18n.strings[self.config.language].from} ${moment(outing.start)
+            tooltip += `<b>${
+              I18n.strings[self.config.language].outing
+            } #${index + 1}</b> : ${
+              I18n.strings[self.config.language].from
+            } ${moment(outing.start)
               .tz(self.config.contract.timezone)
-              .format('HH:mm')} ${I18n.strings[self.config.language].to} ${moment(outing.end)
+              .format('HH:mm')} ${
+              I18n.strings[self.config.language].to
+            } ${moment(outing.end)
               .tz(self.config.contract.timezone)
               .format('HH:mm')}<br>`;
           });
 
           return tooltip;
-        },
+        }
       },
       calculable: true,
       xAxis: [
@@ -105,42 +121,41 @@ export default class Outings {
           axisLabel: {
             nameLocation: 'end',
             formatter(value) {
-              return moment(value)
-                .format('DD/MM');
-            },
-          },
-        },
+              return moment(value).format('DD/MM');
+            }
+          }
+        }
       ],
       yAxis: {
         minInterval: 1,
         min: gfxConfig.min,
         max: gfxConfig.max + 1,
-        type: 'value',
+        type: 'value'
       },
       dataZoom: [
         {
           type: 'slider',
           xAxisIndex: 0,
-          filterMode: 'empty',
+          filterMode: 'empty'
         },
         {
           type: 'inside',
           xAxisIndex: 0,
-          filterMode: 'empty',
-        },
+          filterMode: 'empty'
+        }
       ],
-      series: [{
-        data: dataset,
-        type: 'bar',
-      }],
+      series: [
+        {
+          data: dataset,
+          type: 'bar'
+        }
+      ]
     };
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
 
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
     }
   }
 }

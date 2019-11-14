@@ -12,23 +12,28 @@ export default class SleepsLegacy {
     if (this.config.isReady) {
       this.fetchAndDraw(element, start, end);
     } else {
-      document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
-      }, { once: true });
+      document.addEventListener(
+        'actimetryIsReady',
+        () => {
+          this.fetchAndDraw(element, start, end);
+        },
+        { once: true }
+      );
     }
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element)
-      .classList
-      .add('loading');
+    document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
-      },
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      {
+        headers: {
+          authorization: `Basic ${this.config.credentials}`
+        },
+        method: 'GET'
+      }
+    );
 
     const sleeps = await response.json();
 
@@ -36,15 +41,21 @@ export default class SleepsLegacy {
   }
 
   checkForData(sleeps, element) {
-    const hasActivities = Object.values(sleeps).reduce((total, currentObj) => total + currentObj.details.length, 0) > 0;
+    const hasActivities =
+      Object.values(sleeps).reduce(
+        (total, currentObj) => total + currentObj.details.length,
+        0
+      ) > 0;
     if (hasActivities) {
       this.initDataset(sleeps, element);
     } else {
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+      document.querySelector(
+        element
+      ).innerHTML = `<div class="actimetry__no-data">${
+        I18n.strings[this.config.language].no_data
+      }</div>`;
     }
   }
 
@@ -52,23 +63,24 @@ export default class SleepsLegacy {
     const dataset = [];
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
-      max: Number.MIN_SAFE_INTEGER,
+      max: Number.MIN_SAFE_INTEGER
     };
 
-    Object.keys(sleeps)
-      .forEach((theDate) => {
-        const duration = (moment.duration(sleeps[theDate].duration)
-          .valueOf() / (1000 * 60 * 60)) % 24;
+    Object.keys(sleeps).forEach(theDate => {
+      const duration =
+        (moment.duration(sleeps[theDate].duration).valueOf() /
+          (1000 * 60 * 60)) %
+        24;
 
-        dataset.push([theDate, duration, sleeps[theDate]]);
+      dataset.push([theDate, duration, sleeps[theDate]]);
 
-        if (duration < gfxConfig.min) {
-          gfxConfig.min = duration;
-        }
-        if (duration > gfxConfig.max) {
-          gfxConfig.max = duration;
-        }
-      });
+      if (duration < gfxConfig.min) {
+        gfxConfig.min = duration;
+      }
+      if (duration > gfxConfig.max) {
+        gfxConfig.max = duration;
+      }
+    });
 
     this.setOptions(dataset, gfxConfig, element);
   }
@@ -82,15 +94,33 @@ export default class SleepsLegacy {
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          animation: true,
+          animation: true
         },
         formatter(sleeps) {
           return `
-          ${I18n.strings[self.config.language].bedtime} : ${moment(sleeps[0].data[2].start).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          ${I18n.strings[self.config.language].wakeup_time2} : ${moment(sleeps[0].data[2].end).tz(self.config.contract.timezone).format('HH:mm')}<br>
-          ${sleeps[0].data[2].wakeNumber > 0 ? `${I18n.strings[self.config.language].wokeup_at} ${sleeps[0].data[2].wakeNumber} ${sleeps[0].data[2].wakeNumber > 1 ? `${I18n.strings[self.config.language].times}` : `${I18n.strings[self.config.language].time}`}` : `${I18n.strings[self.config.language].didnt_wake_up_at_night}`}<br>
+          ${I18n.strings[self.config.language].bedtime} : ${moment(
+            sleeps[0].data[2].start
+          )
+            .tz(self.config.contract.timezone)
+            .format('HH:mm')}<br>
+          ${I18n.strings[self.config.language].wakeup_time2} : ${moment(
+            sleeps[0].data[2].end
+          )
+            .tz(self.config.contract.timezone)
+            .format('HH:mm')}<br>
+          ${
+            sleeps[0].data[2].wakeNumber > 0
+              ? `${I18n.strings[self.config.language].wokeup_at} ${
+                  sleeps[0].data[2].wakeNumber
+                } ${
+                  sleeps[0].data[2].wakeNumber > 1
+                    ? `${I18n.strings[self.config.language].times}`
+                    : `${I18n.strings[self.config.language].time}`
+                }`
+              : `${I18n.strings[self.config.language].didnt_wake_up_at_night}`
+          }<br>
           `;
-        },
+        }
       },
       calculable: true,
       xAxis: [
@@ -101,42 +131,41 @@ export default class SleepsLegacy {
           axisLabel: {
             nameLocation: 'end',
             formatter(value) {
-              return moment(value)
-                .format('DD/MM');
-            },
-          },
-        },
+              return moment(value).format('DD/MM');
+            }
+          }
+        }
       ],
       yAxis: {
         minInterval: 1,
         min: parseInt(gfxConfig.min, 10),
         max: parseInt(gfxConfig.max, 10),
-        type: 'value',
+        type: 'value'
       },
       dataZoom: [
         {
           type: 'slider',
           xAxisIndex: 0,
-          filterMode: 'empty',
+          filterMode: 'empty'
         },
         {
           type: 'inside',
           xAxisIndex: 0,
-          filterMode: 'empty',
-        },
+          filterMode: 'empty'
+        }
       ],
-      series: [{
-        data: dataset,
-        type: 'bar',
-      }],
+      series: [
+        {
+          data: dataset,
+          type: 'bar'
+        }
+      ]
     };
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
 
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
     }
   }
 }

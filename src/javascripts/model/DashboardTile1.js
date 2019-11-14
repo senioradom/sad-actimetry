@@ -12,23 +12,28 @@ export default class DashboardTile1 {
     if (this.config.isReady) {
       this.fetchAndDraw(element, start, end);
     } else {
-      document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end);
-      }, { once: true });
+      document.addEventListener(
+        'actimetryIsReady',
+        () => {
+          this.fetchAndDraw(element, start, end);
+        },
+        { once: true }
+      );
     }
   }
 
   async fetchAndDraw(element, start, end) {
-    document.querySelector(element)
-      .classList
-      .add('loading');
+    document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
-      },
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      {
+        headers: {
+          authorization: `Basic ${this.config.credentials}`
+        },
+        method: 'GET'
+      }
+    );
 
     const activitiesPerRoom = await response.json();
 
@@ -36,15 +41,21 @@ export default class DashboardTile1 {
   }
 
   checkForData(activitiesPerRoom, element) {
-    const hasActivities = Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
+    const hasActivities =
+      Object.values(activitiesPerRoom).reduce(
+        (total, currentObj) => total + currentObj.rooms.length,
+        0
+      ) > 0;
     if (hasActivities) {
       this.initDataset(activitiesPerRoom, element);
     } else {
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+      document.querySelector(
+        element
+      ).innerHTML = `<div class="actimetry__no-data">${
+        I18n.strings[this.config.language].no_data
+      }</div>`;
     }
   }
 
@@ -56,39 +67,40 @@ export default class DashboardTile1 {
     const gfxConfig = {
       rooms: [],
       xAxis: [],
-      tooltips: {},
+      tooltips: {}
     };
 
     const rawDataset = [];
 
-    Object.keys(activitiesPerRoom)
-      .forEach((theDate) => {
-        gfxConfig.xAxis.push(theDate);
+    Object.keys(activitiesPerRoom).forEach(theDate => {
+      gfxConfig.xAxis.push(theDate);
 
-        if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
-          activitiesPerRoom[theDate].rooms.forEach((presence) => {
-            if (roomIds.indexOf(presence.room) === -1) {
-              roomIds.push(presence.room);
-            }
+      if (Object.prototype.hasOwnProperty.call(activitiesPerRoom, theDate)) {
+        activitiesPerRoom[theDate].rooms.forEach(presence => {
+          if (roomIds.indexOf(presence.room) === -1) {
+            roomIds.push(presence.room);
+          }
 
-            if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
-              rawDataset[presence.room] = [];
-            }
+          if (
+            !Object.prototype.hasOwnProperty.call(rawDataset, presence.room)
+          ) {
+            rawDataset[presence.room] = [];
+          }
 
-            rawDataset[presence.room]
-              .push(
-                moment.duration(presence.duration)
-                  .valueOf(),
-              );
-          });
-        }
-      });
+          rawDataset[presence.room].push(
+            moment.duration(presence.duration).valueOf()
+          );
+        });
+      }
+    });
 
     roomIds.sort();
 
     const dataset = [];
-    roomIds.forEach((roomId) => {
-      const roomLabel = self.config.contract.rooms.filter((room) => room.id === roomId)[0].label;
+    roomIds.forEach(roomId => {
+      const roomLabel = self.config.contract.rooms.filter(
+        room => room.id === roomId
+      )[0].label;
       gfxConfig.rooms.push(roomLabel);
 
       dataset.push({
@@ -99,9 +111,9 @@ export default class DashboardTile1 {
         showSymbol: false,
         lineStyle: {
           normal: {
-            opacity: 0.5,
-          },
-        },
+            opacity: 0.5
+          }
+        }
       });
     });
 
@@ -124,67 +136,70 @@ export default class DashboardTile1 {
         padding: 5,
         itemGap: 5,
         icon: 'bar',
-        data: gfxConfig.rooms,
+        data: gfxConfig.rooms
       },
       axisPointer: {
         link: {
-          xAxisIndex: 'all',
+          xAxisIndex: 'all'
         },
         label: {
-          backgroundColor: '#777',
-        },
+          backgroundColor: '#777'
+        }
       },
       grid: {
         top: '2%',
         y: 0,
-        y2: 75,
+        y2: 75
       },
-      xAxis: [{
-        type: 'category',
+      xAxis: [
+        {
+          type: 'category',
 
-        data: gfxConfig.xAxis,
-        boundaryGap: false,
-        axisLine: {
-          onZero: false,
-        },
-        splitLine: {
-          show: false,
-        },
-        min: 'dataMin',
-        max: 'dataMax',
-      },
-      ],
-      yAxis: [{
-        scale: true,
-        axisLabel: {
-          formatter(value) {
-            let roundedMinutes = Math.floor(moment.utc(moment.duration(value)
-              .as('milliseconds'))
-              .minute() / 30) * 30;
-
-            if (!roundedMinutes) {
-              roundedMinutes = '00';
-            }
-
-            return moment.utc(moment.duration(value)
-              .as('milliseconds'))
-              .format(`HH[h${roundedMinutes}]`);
+          data: gfxConfig.xAxis,
+          boundaryGap: false,
+          axisLine: {
+            onZero: false
           },
-        },
-        splitArea: {
-          show: true,
-        },
-      },
+          splitLine: {
+            show: false
+          },
+          min: 'dataMin',
+          max: 'dataMax'
+        }
       ],
-      series: dataset,
+      yAxis: [
+        {
+          scale: true,
+          axisLabel: {
+            formatter(value) {
+              let roundedMinutes =
+                Math.floor(
+                  moment
+                    .utc(moment.duration(value).as('milliseconds'))
+                    .minute() / 30
+                ) * 30;
+
+              if (!roundedMinutes) {
+                roundedMinutes = '00';
+              }
+
+              return moment
+                .utc(moment.duration(value).as('milliseconds'))
+                .format(`HH[h${roundedMinutes}]`);
+            }
+          },
+          splitArea: {
+            show: true
+          }
+        }
+      ],
+      series: dataset
     };
 
     if (this.option && typeof this.option === 'object') {
       myChart.setOption(this.option, true);
 
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
     }
   }
 }

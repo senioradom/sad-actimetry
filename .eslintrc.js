@@ -1,5 +1,5 @@
 module.exports = {
-  'extends': 'airbnb-base',
+  'extends': ['airbnb-base', 'plugin:prettier/recommended'],
   'env': {
     'browser': true,
     'node': true
@@ -11,6 +11,7 @@ module.exports = {
         'max-len': 'off',
         'no-param-reassign': 0,
         'class-methods-use-this': 0,
+        'no-underscore-dangle': 0,
       }
     }
   ]

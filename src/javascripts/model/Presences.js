@@ -13,23 +13,28 @@ export default class Presences {
     if (this.config.isReady) {
       this.fetchAndDraw(element, start, end, callback);
     } else {
-      document.addEventListener('actimetryIsReady', () => {
-        this.fetchAndDraw(element, start, end, callback);
-      }, { once: true });
+      document.addEventListener(
+        'actimetryIsReady',
+        () => {
+          this.fetchAndDraw(element, start, end, callback);
+        },
+        { once: true }
+      );
     }
   }
 
   async fetchAndDraw(element, start, end, callback) {
-    document.querySelector(element)
-      .classList
-      .add('loading');
+    document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this.config.credentials}`,
-      },
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      {
+        headers: {
+          authorization: `Basic ${this.config.credentials}`
+        },
+        method: 'GET'
+      }
+    );
 
     const ranges = await response.json();
 
@@ -37,16 +42,21 @@ export default class Presences {
   }
 
   checkForData(ranges, element, callback) {
-    const hasActivities = Object.values(ranges.days)
-      .reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
+    const hasActivities =
+      Object.values(ranges.days).reduce(
+        (total, currentObj) => total + currentObj.activities.length,
+        0
+      ) > 0;
     if (hasActivities) {
       this.initDataset(ranges, element, callback);
     } else {
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${I18n.strings[this.config.language].no_data}</div>`;
+      document.querySelector(
+        element
+      ).innerHTML = `<div class="actimetry__no-data">${
+        I18n.strings[this.config.language].no_data
+      }</div>`;
 
       if (callback && typeof callback === 'function') {
         callback();
@@ -60,7 +70,7 @@ export default class Presences {
 
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
-      max: Number.MIN_SAFE_INTEGER,
+      max: Number.MIN_SAFE_INTEGER
     };
 
     const rooms = this.sortRooms();
@@ -68,8 +78,11 @@ export default class Presences {
     gfxConfig.roomsMapping = rooms.mapping;
 
     let dataset = this.rangesToPresences(ranges, gfxConfig);
-    dataset = this.renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.lastUpdate)
-      .valueOf());
+    dataset = this.renameRoomsAndAddMask(
+      dataset,
+      gfxConfig,
+      moment(ranges.lastUpdate).valueOf()
+    );
     gfxConfig.zoomLevel = this.zoomLevel(gfxConfig.min, gfxConfig.max);
 
     this.setOptions(dataset, gfxConfig, element, callback);
@@ -80,9 +93,14 @@ export default class Presences {
 
     const graphHeight = 35 * gfxConfig.rooms.length;
 
-    document.querySelector(element)
-      .setAttribute('style', `${document.querySelector(element)
-        .getAttribute('style')}; height: ${graphHeight + 140}px;`);
+    document
+      .querySelector(element)
+      .setAttribute(
+        'style',
+        `${document
+          .querySelector(element)
+          .getAttribute('style')}; height: ${graphHeight + 140}px;`
+      );
 
     this.chart = echarts.init(document.querySelector(element));
 
@@ -96,34 +114,39 @@ export default class Presences {
       const end = api.coord([api.value(2), categoryIndex]);
       const height = api.size([0, 1])[1] * heightRatio;
 
-      const rectShape = echarts.graphic.clipRectByRect({
-        x: start[0],
-        y: start[1] - height / 2,
-        width: end[0] - start[0],
-        height,
-      }, {
-        x: params.coordSys.x,
-        y: params.coordSys.y,
-        width: params.coordSys.width,
-        height: params.coordSys.height,
-      });
+      const rectShape = echarts.graphic.clipRectByRect(
+        {
+          x: start[0],
+          y: start[1] - height / 2,
+          width: end[0] - start[0],
+          height
+        },
+        {
+          x: params.coordSys.x,
+          y: params.coordSys.y,
+          width: params.coordSys.width,
+          height: params.coordSys.height
+        }
+      );
 
-      return rectShape && {
-        type: 'rect',
-        shape: rectShape,
-        style: api.style(),
-        styleEmphasis: api.styleEmphasis(),
-      };
+      return (
+        rectShape && {
+          type: 'rect',
+          shape: rectShape,
+          style: api.style(),
+          styleEmphasis: api.styleEmphasis()
+        }
+      );
     }
 
     this.option = {
       tooltip: {
         axisPointer: {
-          type: 'shadow',
+          type: 'shadow'
         },
         formatter(params) {
           return params.value[3] === 'MASK' ? undefined : params.value[3];
-        },
+        }
       },
       dataZoom: [
         {
@@ -134,29 +157,30 @@ export default class Presences {
           height: 10,
           borderColor: 'transparent',
           backgroundColor: '#e2e2e2',
-          handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+          handleIcon:
+            'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
           handleSize: 20,
           handleStyle: {
             shadowBlur: 6,
             shadowOffsetX: 1,
             shadowOffsetY: 2,
-            shadowColor: '#aaa',
+            shadowColor: '#aaa'
           },
           labelFormatter: '',
           start: gfxConfig.zoomLevel,
-          end: 100,
+          end: 100
         },
         {
           type: 'inside',
           start: gfxConfig.zoomLevel,
-          end: 100,
-        },
+          end: 100
+        }
       ],
 
       grid: {
         left: legendsLeftBlock,
         width: this.width - legendsLeftBlock - (this.isMobile ? 35 : 20),
-        height: graphHeight,
+        height: graphHeight
       },
       xAxis: {
         min: gfxConfig.min,
@@ -164,17 +188,18 @@ export default class Presences {
         scale: true,
         axisLabel: {
           formatter(val) {
-            const theDatetime = moment(val)
-              .tz(self.config.contract.timezone);
-            return `${theDatetime.format('DD/MM')}\n${theDatetime.format('HH:mm')}`;
-          },
-        },
+            const theDatetime = moment(val).tz(self.config.contract.timezone);
+            return `${theDatetime.format('DD/MM')}\n${theDatetime.format(
+              'HH:mm'
+            )}`;
+          }
+        }
       },
       yAxis: {
         splitArea: {
-          show: true,
+          show: true
         },
-        data: gfxConfig.rooms,
+        data: gfxConfig.rooms
       },
       series: [
         {
@@ -182,43 +207,41 @@ export default class Presences {
           renderItem,
           itemStyle: {
             normal: {
-              opacity: 0.8,
-            },
+              opacity: 0.8
+            }
           },
 
           encode: {
             x: [1, 2],
-            y: 0,
+            y: 0
           },
-          data: dataset,
-        },
-      ],
+          data: dataset
+        }
+      ]
     };
 
     if (this.option && typeof this.option === 'object') {
       this.chart.setOption(this.option, true);
       this.initEvents(callback);
 
-      document.querySelector(element)
-        .classList
-        .remove('loading');
+      document.querySelector(element).classList.remove('loading');
     }
   }
 
   sortRooms() {
     const mapping = {
       idLabel: {},
-      labelId: {},
+      labelId: {}
     };
 
-    const sorted = ((() => {
+    const sorted = (() => {
       const sortedRoomsArray = [[], [], [], ['OUTING_']];
 
-      this.config.contract.rooms.forEach((room) => {
+      this.config.contract.rooms.forEach(room => {
         mapping.idLabel[room.id] = room.label;
         mapping.labelId[room.label] = room.id;
 
-        room.sensors.forEach((sensor) => {
+        room.sensors.forEach(sensor => {
           switch (sensor.category) {
             case 'motion':
               sortedRoomsArray[0].push(`PRESENCE_${room.label}`);
@@ -235,22 +258,20 @@ export default class Presences {
         });
       });
 
-      [0, 1, 2].forEach((i) => {
+      [0, 1, 2].forEach(i => {
         sortedRoomsArray[i].sort();
       });
 
-      return (
-        sortedRoomsArray[0]
-          .concat(sortedRoomsArray[1])
-          .concat(sortedRoomsArray[2])
-          .concat(sortedRoomsArray[3])
-      )
+      return sortedRoomsArray[0]
+        .concat(sortedRoomsArray[1])
+        .concat(sortedRoomsArray[2])
+        .concat(sortedRoomsArray[3])
         .reverse();
-    })());
+    })();
 
     return {
       sorted,
-      mapping,
+      mapping
     };
   }
 
@@ -268,13 +289,13 @@ export default class Presences {
     obj.value[4] = objParam.rangeType;
 
     obj.itemStyle = {
-      color: colors.normal,
+      color: colors.normal
     };
 
     obj.emphasis = {
       itemStyle: {
-        color: colors.hover,
-      },
+        color: colors.hover
+      }
     };
 
     return obj;
@@ -283,7 +304,7 @@ export default class Presences {
   colorRange(rangeType) {
     const colors = {
       normal: '',
-      hover: '',
+      hover: ''
     };
 
     switch (rangeType) {
@@ -319,32 +340,43 @@ export default class Presences {
     return `<b>${objParam.roomName}</b><br>
                                 <hr>
                                 ${objParam.start} - ${objParam.end}<br>
-                                <b>${I18n.strings[this.config.language].duration} :</b> ${objParam.duration}`;
+                                <b>${
+                                  I18n.strings[this.config.language].duration
+                                } :</b> ${objParam.duration}`;
   }
 
   renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
     presences.forEach((item, key) => {
       if (item.name) {
-        presences[key].value[0] = gfxConfig.rooms.indexOf(`${item.value[4]}_${gfxConfig.roomsMapping.idLabel[item.value[0]]}`);
-      } else { // OUTINGS
+        presences[key].value[0] = gfxConfig.rooms.indexOf(
+          `${item.value[4]}_${gfxConfig.roomsMapping.idLabel[item.value[0]]}`
+        );
+      } else {
+        // OUTINGS
         presences[key].value[0] = 0;
       }
     });
 
     gfxConfig.rooms.forEach((room, index) => {
       if (room.includes('PRESSURE_')) {
-        gfxConfig.rooms[index] = `${I18n.strings[this.config.language].bed} (${room.replace('PRESSURE_', '')
-          .toLowerCase()})`;
+        gfxConfig.rooms[index] = `${
+          I18n.strings[this.config.language].bed
+        } (${room.replace('PRESSURE_', '').toLowerCase()})`;
       } else if (room.includes('DOOR_OPENING_')) {
-        gfxConfig.rooms[index] = `${I18n.strings[this.config.language].door} (${room.replace('DOOR_OPENING_', '')
-          .toLowerCase()})`;
+        gfxConfig.rooms[index] = `${
+          I18n.strings[this.config.language].door
+        } (${room.replace('DOOR_OPENING_', '').toLowerCase()})`;
       } else {
         gfxConfig.rooms[index] = room
           .replace('PRESENCE_', '')
           .replace('OUTING_', I18n.strings[this.config.language].outings);
       }
 
-      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], (this.isMobile) ? 14 : 25, false);
+      gfxConfig.rooms[index] = StringUtils.truncate(
+        gfxConfig.rooms[index],
+        this.isMobile ? 14 : 25,
+        false
+      );
 
       presences.push(
         this.hydrate({
@@ -353,8 +385,8 @@ export default class Presences {
           start: lastUpdate,
           end: gfxConfig.max,
           tooltip: 'MASK',
-          rangeType: 'MASK',
-        }),
+          rangeType: 'MASK'
+        })
       );
     });
 
@@ -364,78 +396,77 @@ export default class Presences {
   rangesToPresences(ranges, gfxConfig) {
     const presences = [];
 
-    Object.keys(ranges.days)
-      .forEach((theDate) => {
-        ranges.days[theDate].activities.forEach((activity, index) => {
-          if (index === 0) {
-            const min = moment(ranges.days[theDate].start)
-              .valueOf();
-            const max = moment(ranges.days[theDate].end)
-              .valueOf();
+    Object.keys(ranges.days).forEach(theDate => {
+      ranges.days[theDate].activities.forEach((activity, index) => {
+        if (index === 0) {
+          const min = moment(ranges.days[theDate].start).valueOf();
+          const max = moment(ranges.days[theDate].end).valueOf();
 
-            if (min < gfxConfig.min) {
-              gfxConfig.min = min;
-            }
-            if (max > gfxConfig.max) {
-              gfxConfig.max = max;
-            }
+          if (min < gfxConfig.min) {
+            gfxConfig.min = min;
           }
-
-          if (!['PRESENCE', 'PRESSURE', 'DOOR_OPENING', 'OUTING'].includes(activity.rangeType)) {
-            return;
+          if (max > gfxConfig.max) {
+            gfxConfig.max = max;
           }
+        }
 
-          const tooltip = this.tooltip({
-            roomName: (activity.rangeType === 'OUTING') ? I18n.strings[this.config.language].outings : gfxConfig.roomsMapping.idLabel[activity.room],
-            start: moment(activity.start)
-              .format('HH:mm:ss'),
-            end: moment(activity.end)
-              .format('HH:mm:ss'),
-            duration: moment.utc(moment.duration(activity.duration)
-              .as('milliseconds'))
-              .format('HH:mm:ss'),
-          });
+        if (
+          !['PRESENCE', 'PRESSURE', 'DOOR_OPENING', 'OUTING'].includes(
+            activity.rangeType
+          )
+        ) {
+          return;
+        }
 
-          if (['DOOR_OPENING'].includes(activity.rangeType)) {
-            if (moment.duration(activity.duration)
-              .valueOf() < 60 * 1000) {
-              ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart)
-                .add(60, 'seconds')
-                .utc()
-                .format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-            }
-          }
-
-          presences.push(
-            this.hydrate({
-              roomName: gfxConfig.roomsMapping.idLabel[activity.room],
-              roomId: activity.room,
-              start: moment(activity.displayStart)
-                .valueOf(),
-              end: moment(activity.displayEnd)
-                .valueOf(),
-              tooltip,
-              rangeType: activity.rangeType,
-            }),
-          );
+        const tooltip = this.tooltip({
+          roomName:
+            activity.rangeType === 'OUTING'
+              ? I18n.strings[this.config.language].outings
+              : gfxConfig.roomsMapping.idLabel[activity.room],
+          start: moment(activity.start).format('HH:mm:ss'),
+          end: moment(activity.end).format('HH:mm:ss'),
+          duration: moment
+            .utc(moment.duration(activity.duration).as('milliseconds'))
+            .format('HH:mm:ss')
         });
+
+        if (['DOOR_OPENING'].includes(activity.rangeType)) {
+          if (moment.duration(activity.duration).valueOf() < 60 * 1000) {
+            ranges.days[theDate].activities[index].displayEnd = moment(
+              activity.displayStart
+            )
+              .add(60, 'seconds')
+              .utc()
+              .format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+          }
+        }
+
+        presences.push(
+          this.hydrate({
+            roomName: gfxConfig.roomsMapping.idLabel[activity.room],
+            roomId: activity.room,
+            start: moment(activity.displayStart).valueOf(),
+            end: moment(activity.displayEnd).valueOf(),
+            tooltip,
+            rangeType: activity.rangeType
+          })
+        );
       });
+    });
 
     return presences;
   }
 
   zoomLevel(min, max) {
-    return 100 - (100 / ((max - min) / 86400000));
+    return 100 - 100 / ((max - min) / 86400000);
   }
 
   initEvents(callback) {
-    this.chart.on('mousemove', (params) => {
+    this.chart.on('mousemove', params => {
       if (params.name === 'MASK') {
-        this.chart.getZr()
-          .setCursorStyle('default');
+        this.chart.getZr().setCursorStyle('default');
       } else {
-        this.chart.getZr()
-          .setCursorStyle('pointer');
+        this.chart.getZr().setCursorStyle('pointer');
       }
     });
 
