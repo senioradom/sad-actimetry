@@ -10,7 +10,7 @@ export default class Activities {
   }
 
   draw(element, start, end) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -32,7 +32,11 @@ export default class Activities {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (this._destroyRequest) {
+    if (
+      !this._config.contract ||
+      document.querySelector(element) == null ||
+      this._destroyRequest
+    ) {
       return;
     }
 
@@ -54,7 +58,7 @@ export default class Activities {
   }
 
   _checkForData(activities, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -73,7 +77,7 @@ export default class Activities {
   }
 
   _initDataset(activities, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -94,7 +98,7 @@ export default class Activities {
   }
 
   _setOptions(dataset, gfxConfig, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -165,7 +169,7 @@ export default class Activities {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 

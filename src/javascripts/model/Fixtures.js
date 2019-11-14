@@ -7,7 +7,7 @@ export default class Fixtures {
   }
 
   draw(element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -29,7 +29,7 @@ export default class Fixtures {
   }
 
   draw2(element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -161,7 +161,7 @@ export default class Fixtures {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 

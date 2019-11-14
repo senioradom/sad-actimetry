@@ -10,7 +10,7 @@ export default class MovesPerRoom {
   }
 
   draw(element, start, end) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -32,7 +32,11 @@ export default class MovesPerRoom {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (this._destroyRequest) {
+    if (
+      !this._config.contract ||
+      document.querySelector(element) == null ||
+      this._destroyRequest
+    ) {
       return;
     }
 
@@ -54,7 +58,7 @@ export default class MovesPerRoom {
   }
 
   _checkForData(movesPerRoom, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -77,7 +81,7 @@ export default class MovesPerRoom {
   }
 
   _initDataset(movesPerRoom, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -135,7 +139,7 @@ export default class MovesPerRoom {
   }
 
   _setOptions(dataset, gfxConfig, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -266,7 +270,7 @@ export default class MovesPerRoom {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 

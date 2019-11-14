@@ -10,7 +10,7 @@ export default class TemperaturesHeatmap {
   }
 
   draw(element, start, end) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -32,7 +32,11 @@ export default class TemperaturesHeatmap {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (this._destroyRequest) {
+    if (
+      !this._config.contract ||
+      document.querySelector(element) == null ||
+      this._destroyRequest
+    ) {
       return;
     }
 
@@ -54,7 +58,7 @@ export default class TemperaturesHeatmap {
   }
 
   _checkForData(temperatures, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -77,7 +81,7 @@ export default class TemperaturesHeatmap {
   }
 
   _initDataset(temperatures, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -168,7 +172,7 @@ export default class TemperaturesHeatmap {
   }
 
   _setOptions(dataset, gfxConfig, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -364,7 +368,7 @@ export default class TemperaturesHeatmap {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 

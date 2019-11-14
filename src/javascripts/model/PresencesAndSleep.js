@@ -10,7 +10,7 @@ export default class PresencesAndSleep {
   }
 
   draw(element, start, end) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -32,7 +32,11 @@ export default class PresencesAndSleep {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (this._destroyRequest) {
+    if (
+      !this._config.contract ||
+      document.querySelector(element) == null ||
+      this._destroyRequest
+    ) {
       return;
     }
 
@@ -54,7 +58,7 @@ export default class PresencesAndSleep {
   }
 
   _checkForData(roomsAndSleeps, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -170,7 +174,7 @@ export default class PresencesAndSleep {
   }
 
   _setOptions(dataset, gfxConfig, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -407,7 +411,7 @@ export default class PresencesAndSleep {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 

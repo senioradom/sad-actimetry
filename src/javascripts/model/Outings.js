@@ -10,7 +10,7 @@ export default class Outings {
   }
 
   draw(element, start, end) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -32,7 +32,11 @@ export default class Outings {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (this._destroyRequest) {
+    if (
+      !this._config.contract ||
+      document.querySelector(element) == null ||
+      this._destroyRequest
+    ) {
       return;
     }
 
@@ -54,7 +58,7 @@ export default class Outings {
   }
 
   _checkForData(outings, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -77,7 +81,7 @@ export default class Outings {
   }
 
   _initDataset(outings, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -102,7 +106,7 @@ export default class Outings {
   }
 
   _setOptions(dataset, gfxConfig, element) {
-    if (this._destroyRequest) {
+    if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -178,7 +182,7 @@ export default class Outings {
     };
 
     if (this._option && typeof this._option === 'object') {
-      if (this._destroyRequest) {
+      if (document.querySelector(element) == null || this._destroyRequest) {
         return;
       }
 
