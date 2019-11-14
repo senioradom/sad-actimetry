@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class SleepsLegacy {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,29 +50,37 @@ export default class SleepsLegacy {
 
     const sleeps = await response.json();
 
-    this.checkForData(sleeps, element);
+    this._checkForData(sleeps, element);
   }
 
-  checkForData(sleeps, element) {
+  _checkForData(sleeps, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(sleeps).reduce(
         (total, currentObj) => total + currentObj.details.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(sleeps, element);
+      this._initDataset(sleeps, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(sleeps, element) {
+  _initDataset(sleeps, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const dataset = [];
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
@@ -82,14 +103,18 @@ export default class SleepsLegacy {
       }
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
     const self = this;
 
-    this.option = {
+    this._option = {
       color: ['#81b41d'],
       tooltip: {
         trigger: 'axis',
@@ -98,26 +123,26 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          ${I18n.strings[self.config.language].bedtime} : ${moment(
+          ${I18n.strings[self._config.language].bedtime} : ${moment(
             sleeps[0].data[2].start
           )
-            .tz(self.config.contract.timezone)
+            .tz(self._config.contract.timezone)
             .format('HH:mm')}<br>
-          ${I18n.strings[self.config.language].wakeup_time2} : ${moment(
+          ${I18n.strings[self._config.language].wakeup_time2} : ${moment(
             sleeps[0].data[2].end
           )
-            .tz(self.config.contract.timezone)
+            .tz(self._config.contract.timezone)
             .format('HH:mm')}<br>
           ${
             sleeps[0].data[2].wakeNumber > 0
-              ? `${I18n.strings[self.config.language].wokeup_at} ${
+              ? `${I18n.strings[self._config.language].wokeup_at} ${
                   sleeps[0].data[2].wakeNumber
                 } ${
                   sleeps[0].data[2].wakeNumber > 1
-                    ? `${I18n.strings[self.config.language].times}`
-                    : `${I18n.strings[self.config.language].time}`
+                    ? `${I18n.strings[self._config.language].times}`
+                    : `${I18n.strings[self._config.language].time}`
                 }`
-              : `${I18n.strings[self.config.language].didnt_wake_up_at_night}`
+              : `${I18n.strings[self._config.language].didnt_wake_up_at_night}`
           }<br>
           `;
         }
@@ -162,8 +187,12 @@ export default class SleepsLegacy {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

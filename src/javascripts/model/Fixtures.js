@@ -2,11 +2,16 @@ import echarts from 'echarts/dist/echarts.min';
 
 export default class Fixtures {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element) {
-    if (this.config.isReady) {
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
       this.draw2(element);
     } else {
       document.addEventListener(
@@ -19,10 +24,18 @@ export default class Fixtures {
     }
   }
 
+  stop() {
+    this._destroyRequest = true;
+  }
+
   draw2(element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
 
-    this.option = {
+    this._option = {
       tooltip: {
         trigger: 'axis',
         showContent: false
@@ -147,8 +160,12 @@ export default class Fixtures {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
     }
   }
 }

@@ -5,24 +5,37 @@ import I18n from './I18n';
 
 export default class Sleeps {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element);
+          this._fetchAndDraw(element);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     // @todo : Plug to real data
@@ -67,10 +80,14 @@ export default class Sleeps {
       }
     };
 
-    this.initDataset(sleeps.data, element);
+    this._initDataset(sleeps.data, element);
   }
 
-  initDataset(dataset, element) {
+  _initDataset(dataset, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const gfxConfig = {
       colors: ['#96bed8', '#639fa6']
     };
@@ -87,15 +104,19 @@ export default class Sleeps {
         .valueOf();
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
 
     const self = this;
 
-    this.option = {
+    this._option = {
       color: gfxConfig.colors,
 
       tooltip: {
@@ -118,10 +139,10 @@ export default class Sleeps {
 <p class="header">Le ${moment(params[0].axisValue).format('DD/MM/YYYY')}</p>
 `;
           htmlTooltip += `
-<p>${I18n.strings[self.config.language].sleep_duration} : <strong>${moment
+<p>${I18n.strings[self._config.language].sleep_duration} : <strong>${moment
             .utc(moment.duration(params[0].value).as('milliseconds'))
             .format('HH[h]mm')}</strong></p>
-<p>${I18n.strings[self.config.language].averages} ${moment(
+<p>${I18n.strings[self._config.language].averages} ${moment(
             params[0].axisValue
           ).format('dddd')} : <strong>${moment(params[1].value).format(
             'HH[h]mm'
@@ -188,8 +209,12 @@ export default class Sleeps {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

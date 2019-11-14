@@ -25,24 +25,24 @@ import '../stylesheets/styles.scss';
 
 export default class Actimetry {
   constructor(settings) {
-    this.config = new Config(settings);
+    this._config = new Config(settings);
 
-    this.presences = new Presences(this.config);
-    this.temperatures = new TemperaturesHeatmap(this.config);
-    this.temperaturesLegacy = new TemperaturesLegacy(this.config);
-    this.sleepsLegacy = new SleepsLegacy(this.config);
-    this.outings = new Outings(this.config);
-    this.activities = new Activities(this.config);
-    this.presencesAndSleep = new PresencesAndSleep(this.config);
-    this.movesPerRoom = new MovesPerRoom(this.config);
-    this.sleeps = new Sleeps(this.config);
-    this.fixtures = new Fixtures(this.config);
-    this.dashboardTile1 = new DashboardTile1(this.config);
+    this.presences = new Presences(this._config);
+    this.temperatures = new TemperaturesHeatmap(this._config);
+    this.temperaturesLegacy = new TemperaturesLegacy(this._config);
+    this.sleepsLegacy = new SleepsLegacy(this._config);
+    this.outings = new Outings(this._config);
+    this.activities = new Activities(this._config);
+    this.presencesAndSleep = new PresencesAndSleep(this._config);
+    this.movesPerRoom = new MovesPerRoom(this._config);
+    this.sleeps = new Sleeps(this._config);
+    this.fixtures = new Fixtures(this._config);
+    this.dashboardTile1 = new DashboardTile1(this._config);
 
     this.version = version;
   }
 
   setLanguage(newLanguage) {
-    this.config.setLanguage(newLanguage);
+    this._config.setLanguage(newLanguage);
   }
 }

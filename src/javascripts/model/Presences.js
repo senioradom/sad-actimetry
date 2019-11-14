@@ -6,31 +6,44 @@ import StringUtils from '../StringUtils';
 
 export default class Presences {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end, callback) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end, callback);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end, callback);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end, callback);
+          this._fetchAndDraw(element, start, end, callback);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end, callback) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end, callback) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -38,24 +51,28 @@ export default class Presences {
 
     const ranges = await response.json();
 
-    this.checkForData(ranges, element, callback);
+    this._checkForData(ranges, element, callback);
   }
 
-  checkForData(ranges, element, callback) {
+  _checkForData(ranges, element, callback) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(ranges.days).reduce(
         (total, currentObj) => total + currentObj.activities.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(ranges, element, callback);
+      this._initDataset(ranges, element, callback);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
 
       if (callback && typeof callback === 'function') {
@@ -64,31 +81,39 @@ export default class Presences {
     }
   }
 
-  initDataset(ranges, element, callback) {
-    this.width = document.querySelector(element).offsetWidth;
-    this.isMobile = document.defaultView.innerWidth <= 768;
+  _initDataset(ranges, element, callback) {
+    if (this._destroyRequest) {
+      return;
+    }
+
+    this._width = document.querySelector(element).offsetWidth;
+    this._isMobile = document.defaultView.innerWidth <= 768;
 
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
       max: Number.MIN_SAFE_INTEGER
     };
 
-    const rooms = this.sortRooms();
+    const rooms = this._sortRooms();
     gfxConfig.rooms = rooms.sorted;
     gfxConfig.roomsMapping = rooms.mapping;
 
-    let dataset = this.rangesToPresences(ranges, gfxConfig);
-    dataset = this.renameRoomsAndAddMask(
+    let dataset = this._rangesToPresences(ranges, gfxConfig);
+    dataset = this._renameRoomsAndAddMask(
       dataset,
       gfxConfig,
       moment(ranges.lastUpdate).valueOf()
     );
-    gfxConfig.zoomLevel = this.zoomLevel(gfxConfig.min, gfxConfig.max);
+    gfxConfig.zoomLevel = this._zoomLevel(gfxConfig.min, gfxConfig.max);
 
-    this.setOptions(dataset, gfxConfig, element, callback);
+    this._setOptions(dataset, gfxConfig, element, callback);
   }
 
-  setOptions(dataset, gfxConfig, element, callback) {
+  _setOptions(dataset, gfxConfig, element, callback) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const self = this;
 
     const graphHeight = 35 * gfxConfig.rooms.length;
@@ -102,9 +127,9 @@ export default class Presences {
           .getAttribute('style')}; height: ${graphHeight + 140}px;`
       );
 
-    this.chart = echarts.init(document.querySelector(element));
+    this._chart = echarts.init(document.querySelector(element));
 
-    const legendsLeftBlock = this.isMobile ? 90 : 150;
+    const legendsLeftBlock = this._isMobile ? 90 : 150;
 
     function renderItem(params, api) {
       const heightRatio = api.value(3) === 'MASK' ? 1 : 0.6;
@@ -139,7 +164,7 @@ export default class Presences {
       );
     }
 
-    this.option = {
+    this._option = {
       tooltip: {
         axisPointer: {
           type: 'shadow'
@@ -179,7 +204,7 @@ export default class Presences {
 
       grid: {
         left: legendsLeftBlock,
-        width: this.width - legendsLeftBlock - (this.isMobile ? 35 : 20),
+        width: this._width - legendsLeftBlock - (this._isMobile ? 35 : 20),
         height: graphHeight
       },
       xAxis: {
@@ -188,7 +213,7 @@ export default class Presences {
         scale: true,
         axisLabel: {
           formatter(val) {
-            const theDatetime = moment(val).tz(self.config.contract.timezone);
+            const theDatetime = moment(val).tz(self._config.contract.timezone);
             return `${theDatetime.format('DD/MM')}\n${theDatetime.format(
               'HH:mm'
             )}`;
@@ -220,15 +245,19 @@ export default class Presences {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      this.chart.setOption(this.option, true);
-      this.initEvents(callback);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      this._chart.setOption(this._option, true);
+      this._initEvents(callback);
 
       document.querySelector(element).classList.remove('loading');
     }
   }
 
-  sortRooms() {
+  _sortRooms() {
     const mapping = {
       idLabel: {},
       labelId: {}
@@ -237,7 +266,7 @@ export default class Presences {
     const sorted = (() => {
       const sortedRoomsArray = [[], [], [], ['OUTING_']];
 
-      this.config.contract.rooms.forEach(room => {
+      this._config.contract.rooms.forEach(room => {
         mapping.idLabel[room.id] = room.label;
         mapping.labelId[room.label] = room.id;
 
@@ -275,8 +304,8 @@ export default class Presences {
     };
   }
 
-  hydrate(objParam) {
-    const colors = this.colorRange(objParam.rangeType);
+  _hydrate(objParam) {
+    const colors = this._colorRange(objParam.rangeType);
 
     const obj = {};
     obj.name = objParam.roomName;
@@ -301,7 +330,7 @@ export default class Presences {
     return obj;
   }
 
-  colorRange(rangeType) {
+  _colorRange(rangeType) {
     const colors = {
       normal: '',
       hover: ''
@@ -335,17 +364,17 @@ export default class Presences {
     return colors;
   }
 
-  tooltip(objParam) {
+  _tooltip(objParam) {
     // const self = this;
     return `<b>${objParam.roomName}</b><br>
                                 <hr>
                                 ${objParam.start} - ${objParam.end}<br>
                                 <b>${
-                                  I18n.strings[this.config.language].duration
+                                  I18n.strings[this._config.language].duration
                                 } :</b> ${objParam.duration}`;
   }
 
-  renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
+  _renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
     presences.forEach((item, key) => {
       if (item.name) {
         presences[key].value[0] = gfxConfig.rooms.indexOf(
@@ -360,26 +389,26 @@ export default class Presences {
     gfxConfig.rooms.forEach((room, index) => {
       if (room.includes('PRESSURE_')) {
         gfxConfig.rooms[index] = `${
-          I18n.strings[this.config.language].bed
+          I18n.strings[this._config.language].bed
         } (${room.replace('PRESSURE_', '').toLowerCase()})`;
       } else if (room.includes('DOOR_OPENING_')) {
         gfxConfig.rooms[index] = `${
-          I18n.strings[this.config.language].door
+          I18n.strings[this._config.language].door
         } (${room.replace('DOOR_OPENING_', '').toLowerCase()})`;
       } else {
         gfxConfig.rooms[index] = room
           .replace('PRESENCE_', '')
-          .replace('OUTING_', I18n.strings[this.config.language].outings);
+          .replace('OUTING_', I18n.strings[this._config.language].outings);
       }
 
       gfxConfig.rooms[index] = StringUtils.truncate(
         gfxConfig.rooms[index],
-        this.isMobile ? 14 : 25,
+        this._isMobile ? 14 : 25,
         false
       );
 
       presences.push(
-        this.hydrate({
+        this._hydrate({
           roomName: 'MASK',
           roomId: index,
           start: lastUpdate,
@@ -393,7 +422,7 @@ export default class Presences {
     return presences;
   }
 
-  rangesToPresences(ranges, gfxConfig) {
+  _rangesToPresences(ranges, gfxConfig) {
     const presences = [];
 
     Object.keys(ranges.days).forEach(theDate => {
@@ -418,10 +447,10 @@ export default class Presences {
           return;
         }
 
-        const tooltip = this.tooltip({
+        const tooltip = this._tooltip({
           roomName:
             activity.rangeType === 'OUTING'
-              ? I18n.strings[this.config.language].outings
+              ? I18n.strings[this._config.language].outings
               : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start).format('HH:mm:ss'),
           end: moment(activity.end).format('HH:mm:ss'),
@@ -442,7 +471,7 @@ export default class Presences {
         }
 
         presences.push(
-          this.hydrate({
+          this._hydrate({
             roomName: gfxConfig.roomsMapping.idLabel[activity.room],
             roomId: activity.room,
             start: moment(activity.displayStart).valueOf(),
@@ -457,20 +486,20 @@ export default class Presences {
     return presences;
   }
 
-  zoomLevel(min, max) {
+  _zoomLevel(min, max) {
     return 100 - 100 / ((max - min) / 86400000);
   }
 
-  initEvents(callback) {
-    this.chart.on('mousemove', params => {
+  _initEvents(callback) {
+    this._chart.on('mousemove', params => {
       if (params.name === 'MASK') {
-        this.chart.getZr().setCursorStyle('default');
+        this._chart.getZr().setCursorStyle('default');
       } else {
-        this.chart.getZr().setCursorStyle('pointer');
+        this._chart.getZr().setCursorStyle('pointer');
       }
     });
 
-    this.chart.on('finished', () => {
+    this._chart.on('finished', () => {
       if (callback && typeof callback === 'function') {
         callback();
       }

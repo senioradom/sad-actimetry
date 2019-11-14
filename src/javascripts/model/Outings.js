@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class Outings {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,29 +50,37 @@ export default class Outings {
 
     const outings = await response.json();
 
-    this.checkForData(outings, element);
+    this._checkForData(outings, element);
   }
 
-  checkForData(outings, element) {
+  _checkForData(outings, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(outings).reduce(
         (total, currentObj) => total + currentObj.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(outings, element);
+      this._initDataset(outings, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(outings, element) {
+  _initDataset(outings, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const dataset = [];
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
@@ -77,14 +98,18 @@ export default class Outings {
       }
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
     const self = this;
 
-    this.option = {
+    this._option = {
       color: ['#81b41d'],
       tooltip: {
         trigger: 'axis',
@@ -95,15 +120,15 @@ export default class Outings {
           let tooltip = '';
           outings[0].data[2].forEach((outing, index) => {
             tooltip += `<b>${
-              I18n.strings[self.config.language].outing
+              I18n.strings[self._config.language].outing
             } #${index + 1}</b> : ${
-              I18n.strings[self.config.language].from
+              I18n.strings[self._config.language].from
             } ${moment(outing.start)
-              .tz(self.config.contract.timezone)
+              .tz(self._config.contract.timezone)
               .format('HH:mm')} ${
-              I18n.strings[self.config.language].to
+              I18n.strings[self._config.language].to
             } ${moment(outing.end)
-              .tz(self.config.contract.timezone)
+              .tz(self._config.contract.timezone)
               .format('HH:mm')}<br>`;
           });
 
@@ -152,8 +177,12 @@ export default class Outings {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

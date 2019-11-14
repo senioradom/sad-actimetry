@@ -4,41 +4,58 @@ import 'moment-timezone';
 
 export default class TemperaturesLegacy {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
-  draw(element, type, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, type, start, end);
+  _draw(element, type, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, type, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, type, start, end);
+          this._fetchAndDraw(element, type, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, type, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, type, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
     );
 
     const temperatures = await response.json();
-    this.initDataset(temperatures, element, type);
+    this._initDataset(temperatures, element, type);
   }
 
-  initDataset(temperatures, element, type) {
+  _initDataset(temperatures, element, type) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const dataset = [];
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
@@ -60,12 +77,16 @@ export default class TemperaturesLegacy {
       });
     });
 
-    this.setOptions(dataset, gfxConfig, element, type);
+    this._setOptions(dataset, gfxConfig, element, type);
   }
 
-  setOptions(dataset, gfxConfig, element, type) {
+  _setOptions(dataset, gfxConfig, element, type) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
-    this.option = {
+    this._option = {
       /*
       title: {
         text: i18n.strings[this.config.contract.language][`temperatures_${type}`],
@@ -131,8 +152,12 @@ export default class TemperaturesLegacy {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

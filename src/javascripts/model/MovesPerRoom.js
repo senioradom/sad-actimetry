@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class MovesPerRoom {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,29 +50,37 @@ export default class MovesPerRoom {
 
     const movesPerRoom = await response.json();
 
-    this.checkForData(movesPerRoom, element);
+    this._checkForData(movesPerRoom, element);
   }
 
-  checkForData(movesPerRoom, element) {
+  _checkForData(movesPerRoom, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(movesPerRoom.moves).reduce(
         (total, currentObj) => total + currentObj.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(movesPerRoom, element);
+      this._initDataset(movesPerRoom, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(movesPerRoom, element) {
+  _initDataset(movesPerRoom, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const self = this;
 
     const gfxConfig = {
@@ -89,12 +110,12 @@ export default class MovesPerRoom {
     };
 
     const mappingRoomsIdsToLabels = Object.assign(
-      ...Object.entries(self.config.contract.rooms).map(([, v]) => ({
+      ...Object.entries(self._config.contract.rooms).map(([, v]) => ({
         [v.id]: v.label
       }))
     );
 
-    this.numberOfMovesThisMonth = movesPerRoom.monthAverage;
+    this._numberOfMovesThisMonth = movesPerRoom.monthAverage;
 
     const dataset = [];
 
@@ -110,15 +131,19 @@ export default class MovesPerRoom {
       });
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
 
     const self = this;
 
-    this.option = {
+    this._option = {
       color: gfxConfig.colors,
       grid: {
         left: '0%'
@@ -138,7 +163,7 @@ export default class MovesPerRoom {
           };
         },
         formatter(params) {
-          const beneficiary = self.config.contract.persons.filter(
+          const beneficiary = self._config.contract.persons.filter(
             p => p.roles.indexOf('beneficiary') > -1
           );
 
@@ -151,19 +176,21 @@ export default class MovesPerRoom {
           htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(
             params[0].data[0]
           ).format('DD/MM/YYYY')} - ${totalMoves} ${
-            I18n.strings[self.config.language].total_moves
+            I18n.strings[self._config.language].total_moves
           }</p>`;
-          htmlTooltip += `<p>${I18n.strings[self.config.language].this_month} ${
+          htmlTooltip += `<p>${
+            I18n.strings[self._config.language].this_month
+          } ${
             beneficiary.length
               ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}`
               : ''
-          } ${I18n.strings[self.config.language].was_detected} <strong>${
-            self.numberOfMovesThisMonth
-          }</strong> ${I18n.strings[self.config.language].times_2}.</p>`;
+          } ${I18n.strings[self._config.language].was_detected} <strong>${
+            self._numberOfMovesThisMonth
+          }</strong> ${I18n.strings[self._config.language].times_2}.</p>`;
 
           params.forEach(item => {
             const rez = `<p>${item.data[2]}: <strong>${item.data[1]} ${
-              I18n.strings[self.config.language].moves
+              I18n.strings[self._config.language].moves
             }</strong></p>`;
             htmlTooltip += rez;
           });
@@ -238,8 +265,12 @@ export default class MovesPerRoom {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

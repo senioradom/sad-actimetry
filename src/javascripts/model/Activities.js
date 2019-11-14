@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class Activities {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,25 +50,33 @@ export default class Activities {
 
     const activities = await response.json();
 
-    this.checkForData(activities, element);
+    this._checkForData(activities, element);
   }
 
-  checkForData(activities, element) {
+  _checkForData(activities, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities = activities.length > 0;
     if (hasActivities) {
-      this.initDataset(activities, element);
+      this._initDataset(activities, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(activities, element) {
+  _initDataset(activities, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const dataset = [];
     const gfxConfig = {
       min: 0,
@@ -69,12 +90,16 @@ export default class Activities {
       });
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
-    this.option = {
+    this._option = {
       /*
       title: {
         text: i18n.strings[this.config.contract.language][`activities_${type}`],
@@ -139,8 +164,12 @@ export default class Activities {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

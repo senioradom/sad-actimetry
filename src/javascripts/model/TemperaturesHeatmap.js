@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class TemperaturesHeatmap {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,31 +50,39 @@ export default class TemperaturesHeatmap {
 
     const temperatures = await response.json();
 
-    this.checkForData(temperatures, element);
+    this._checkForData(temperatures, element);
   }
 
-  checkForData(temperatures, element) {
+  _checkForData(temperatures, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(temperatures).reduce(
         (total, currentObj) => total + currentObj.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(temperatures, element);
+      this._initDataset(temperatures, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(temperatures, element) {
-    this.width = document.querySelector(element).offsetWidth;
-    this.isMobile = document.defaultView.innerWidth <= 768;
+  _initDataset(temperatures, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
+    this._width = document.querySelector(element).offsetWidth;
+    this._isMobile = document.defaultView.innerWidth <= 768;
 
     const self = this;
 
@@ -89,7 +110,7 @@ export default class TemperaturesHeatmap {
 
         temperatures[theDate].forEach(value => {
           const currentHour = moment(value.createdAt)
-            .tz(self.config.contract.timezone)
+            .tz(self._config.contract.timezone)
             .hour();
           temporaryTemperaturesObject[theDate][currentHour] = Math.max(
             temporaryTemperaturesObject[theDate][currentHour],
@@ -110,9 +131,9 @@ export default class TemperaturesHeatmap {
       ) {
         gfxConfig.days.push(
           moment(theDate)
-            .tz(self.config.contract.timezone)
+            .tz(self._config.contract.timezone)
             // .locale('fr')
-            .format(self.isMobile ? 'DD/MM' : 'dddd DD/MM')
+            .format(self._isMobile ? 'DD/MM' : 'dddd DD/MM')
         );
 
         Object.keys(temporaryTemperaturesObject[theDate]).forEach(hour => {
@@ -143,10 +164,14 @@ export default class TemperaturesHeatmap {
       gfxConfig.hours.push(`${hour}h`);
     }
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
     const width = document.defaultView.innerWidth;
 
@@ -158,7 +183,7 @@ export default class TemperaturesHeatmap {
       zoomLevel = 50;
     }
 
-    this.option = {
+    this._option = {
       tooltip: {
         show: false
       },
@@ -166,7 +191,7 @@ export default class TemperaturesHeatmap {
       grid: {
         right: 20,
         y: '0%',
-        width: this.width - (this.isMobile ? 60 : 130),
+        width: this._width - (this._isMobile ? 60 : 130),
         height: 500
       },
       xAxis: {
@@ -338,8 +363,12 @@ export default class TemperaturesHeatmap {
       ]
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }

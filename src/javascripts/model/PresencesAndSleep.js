@@ -5,31 +5,44 @@ import I18n from './I18n';
 
 export default class PresencesAndSleep {
   constructor(config) {
-    this.config = config;
+    this._config = config;
+    this._destroyRequest = false;
   }
 
   draw(element, start, end) {
-    if (this.config.isReady) {
-      this.fetchAndDraw(element, start, end);
+    if (this._destroyRequest) {
+      return;
+    }
+
+    if (this._config.isReady) {
+      this._fetchAndDraw(element, start, end);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this.fetchAndDraw(element, start, end);
+          this._fetchAndDraw(element, start, end);
         },
         { once: true }
       );
     }
   }
 
-  async fetchAndDraw(element, start, end) {
+  stop() {
+    this._destroyRequest = true;
+  }
+
+  async _fetchAndDraw(element, start, end) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     document.querySelector(element).classList.add('loading');
 
     const response = await fetch(
-      `${this.config.api}/api/4/contracts/${this.config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this.config.contract.timezone}`,
+      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
       {
         headers: {
-          authorization: `Basic ${this.config.credentials}`
+          authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       }
@@ -37,30 +50,34 @@ export default class PresencesAndSleep {
 
     const roomsAndSleeps = await response.json();
 
-    this.checkForData(roomsAndSleeps, element);
+    this._checkForData(roomsAndSleeps, element);
   }
 
-  checkForData(roomsAndSleeps, element) {
+  _checkForData(roomsAndSleeps, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const hasActivities =
       Object.values(roomsAndSleeps).reduce(
         (total, currentObj) => total + currentObj.rooms.length,
         0
       ) > 0;
     if (hasActivities) {
-      this.initDataset(roomsAndSleeps, element);
+      this._initDataset(roomsAndSleeps, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
       document.querySelector(
         element
       ).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this.config.language].no_data
+        I18n.strings[this._config.language].no_data
       }</div>`;
     }
   }
 
-  initDataset(roomsAndSleeps, element) {
-    this.width = document.querySelector(element).offsetWidth;
+  _initDataset(roomsAndSleeps, element) {
+    this._width = document.querySelector(element).offsetWidth;
 
     const self = this;
 
@@ -118,7 +135,7 @@ export default class PresencesAndSleep {
 
     const dataset = [];
     roomIds.forEach(roomId => {
-      const roomLabel = self.config.contract.rooms.filter(
+      const roomLabel = self._config.contract.rooms.filter(
         room => room.id === roomId
       )[0].label;
       gfxConfig.rooms.push(roomLabel);
@@ -137,7 +154,7 @@ export default class PresencesAndSleep {
     });
 
     dataset.push({
-      name: I18n.strings[this.config.language].sleep,
+      name: I18n.strings[this._config.language].sleep,
       type: 'bar',
       xAxisIndex: 1,
       yAxisIndex: 1,
@@ -149,14 +166,18 @@ export default class PresencesAndSleep {
       data: rawDataset.sleep
     });
 
-    this.setOptions(dataset, gfxConfig, element);
+    this._setOptions(dataset, gfxConfig, element);
   }
 
-  setOptions(dataset, gfxConfig, element) {
+  _setOptions(dataset, gfxConfig, element) {
+    if (this._destroyRequest) {
+      return;
+    }
+
     const myChart = echarts.init(document.querySelector(element));
 
     const coordonates = {
-      width: this.width - 90,
+      width: this._width - 90,
       linesChart: {
         y: 10,
         height: 377
@@ -174,9 +195,9 @@ export default class PresencesAndSleep {
     };
 
     const self = this;
-    self.tooltips = gfxConfig.tooltips;
+    self._tooltips = gfxConfig.tooltips;
 
-    this.option = {
+    this._option = {
       color: [
         '#2f4f4f',
         '#228b22',
@@ -213,7 +234,7 @@ export default class PresencesAndSleep {
         data: gfxConfig.rooms
       },
       title: {
-        text: I18n.strings[self.config.language].daily_sleep_duration,
+        text: I18n.strings[self._config.language].daily_sleep_duration,
         textStyle: {
           color: '#222',
           fontWeight: 'normal',
@@ -240,12 +261,12 @@ export default class PresencesAndSleep {
           const activites = params.filter(serie => serie.seriesType === 'line');
           let sleep = params.filter(serie => serie.seriesType === 'bar');
 
-          sleep = self.tooltips[sleep[0].axisValue];
+          sleep = self._tooltips[sleep[0].axisValue];
 
           let htmlTooltip = `<div class="presences-and-sleep-tooltip">
           <p class="header header--activities">
           <i class="icon-activities"></i> ${
-            I18n.strings[self.config.language].presences
+            I18n.strings[self._config.language].presences
           }
           </p>`;
           activites.forEach(item => {
@@ -258,22 +279,22 @@ export default class PresencesAndSleep {
             htmlTooltip += `
             <p class="header header--sleeps">
             <i class="icon-sleeps"></i> ${
-              I18n.strings[self.config.language].sleep
+              I18n.strings[self._config.language].sleep
             }
             </p>
             <p>${
-              I18n.strings[self.config.language].duration
+              I18n.strings[self._config.language].duration
             } : <strong>${moment
               .utc(moment.duration(sleep.duration).as('milliseconds'))
               .format('HH[h]mm')}</strong></p>
-            <p>${I18n.strings[self.config.language].bedtime} : <strong>${moment(
-              sleep.start
-            ).format('HH[h]mm')}</strong></p>
             <p>${
-              I18n.strings[self.config.language].wakeup_time
+              I18n.strings[self._config.language].bedtime
+            } : <strong>${moment(sleep.start).format('HH[h]mm')}</strong></p>
+            <p>${
+              I18n.strings[self._config.language].wakeup_time
             } : <strong>${moment(sleep.end).format('HH[h]mm')}</strong></p>
             <p>${
-              I18n.strings[self.config.language]
+              I18n.strings[self._config.language]
                 .number_of_wakeups_during_the_night
             } : <strong>${sleep.wakeNumber}</strong></p>
             </div>`;
@@ -385,8 +406,12 @@ export default class PresencesAndSleep {
       series: dataset
     };
 
-    if (this.option && typeof this.option === 'object') {
-      myChart.setOption(this.option, true);
+    if (this._option && typeof this._option === 'object') {
+      if (this._destroyRequest) {
+        return;
+      }
+
+      myChart.setOption(this._option, true);
 
       document.querySelector(element).classList.remove('loading');
     }
