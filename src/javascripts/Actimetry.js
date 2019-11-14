@@ -26,6 +26,7 @@ import '../stylesheets/styles.scss';
 export default class Actimetry {
   constructor(settings) {
     this.config = new Config(settings);
+
     this.presences = new Presences(this.config);
     this.temperatures = new TemperaturesHeatmap(this.config);
     this.temperaturesLegacy = new TemperaturesLegacy(this.config);
@@ -39,5 +40,9 @@ export default class Actimetry {
     this.dashboardTile1 = new DashboardTile1(this.config);
 
     this.version = version;
+  }
+
+  setLanguage(newLanguage) {
+    this.config.setLanguage(newLanguage);
   }
 }

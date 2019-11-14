@@ -46,15 +46,25 @@ export default class Config {
         this.language = this.contract.language;
       }
 
-      if (!['en', 'fr', 'es'].includes(this.language)) {
-        this.language = 'fr';
-      }
-
-      moment.locale(this.language);
+      this.setLanguage(this.language);
 
       document.dispatchEvent(new CustomEvent('actimetryIsReady'));
     } else {
       throw new Error('No contract...');
     }
+  }
+
+  setLanguage(newLanguage) {
+    if (!this._validateLanguage(newLanguage)) {
+      this.language = 'fr';
+    } else {
+      this.language = newLanguage;
+    }
+
+    moment.locale(this.language);
+  }
+
+  _validateLanguage(language) {
+    return ['en', 'fr', 'es'].includes(language);
   }
 }
