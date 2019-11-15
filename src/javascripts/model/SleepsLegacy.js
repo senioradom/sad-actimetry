@@ -167,7 +167,7 @@ export default class SleepsLegacy {
       ],
       yAxis: {
         minInterval: 1,
-        min: parseInt(gfxConfig.min, 10),
+        min: 0,
         max: parseInt(gfxConfig.max, 10),
         type: 'value'
       },
