@@ -265,7 +265,7 @@ export default class TemperaturesHeatmap {
             ]
           },
           formatter(params) {
-            return `${params}°`;
+            return `${(params * 2).toFixed() / 2}°`;
           }
         },
         {
