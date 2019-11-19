@@ -411,16 +411,18 @@ export default class Presences {
         false
       );
 
-      presences.push(
-        this._hydrate({
-          roomName: 'MASK',
-          roomId: index,
-          start: lastUpdate,
-          end: gfxConfig.max,
-          tooltip: 'MASK',
-          rangeType: 'MASK'
-        })
-      );
+      if (lastUpdate <= gfxConfig.max) {
+        presences.push(
+          this._hydrate({
+            roomName: 'MASK',
+            roomId: index,
+            start: lastUpdate,
+            end: gfxConfig.max,
+            tooltip: 'MASK',
+            rangeType: 'MASK'
+          })
+        );
+      }
     });
 
     return presences;
