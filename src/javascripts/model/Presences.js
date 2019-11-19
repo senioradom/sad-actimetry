@@ -133,7 +133,7 @@ export default class Presences {
 
     let graphHeight;
     if (isHeightSupplied) {
-      graphHeight = options.height - 110;
+      graphHeight = options.height;
     } else {
       graphHeight = 35 * gfxConfig.rooms.length;
     }
@@ -143,7 +143,7 @@ export default class Presences {
       .setAttribute(
         'style',
         `${document.querySelector(element).getAttribute('style')}; height: ${
-          isHeightSupplied ? graphHeight : graphHeight + 140
+          isHeightSupplied ? graphHeight + 35 : graphHeight + 140
         }px;`
       );
 
