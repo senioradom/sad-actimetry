@@ -73,7 +73,7 @@
     "url-polyfill": "^1.1.7",
     "promise-polyfill": "8.1.3",
     "echarts": "4.5.0",
-    "moment": "~2.18.1",
+    "moment": "~2.24.0",
     "moment-timezone": "~0.5.13"
   },
   "main": "dist/actimetry.js",
