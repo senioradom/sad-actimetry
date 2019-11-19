@@ -10,18 +10,18 @@ export default class Presences {
     this._destroyRequest = false;
   }
 
-  draw(element, start, end, callback) {
+  draw(element, start, end, options, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
     if (this._config.isReady) {
-      this._fetchAndDraw(element, start, end, callback);
+      this._fetchAndDraw(element, start, end, options, callback);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this._fetchAndDraw(element, start, end, callback);
+          this._fetchAndDraw(element, start, end, options, callback);
         },
         { once: true }
       );
@@ -41,7 +41,7 @@ export default class Presences {
     this._destroyRequest = true;
   }
 
-  async _fetchAndDraw(element, start, end, callback) {
+  async _fetchAndDraw(element, start, end, options, callback) {
     if (
       !this._config.contract ||
       document.querySelector(element) == null ||
@@ -64,10 +64,10 @@ export default class Presences {
 
     const ranges = await response.json();
 
-    this._checkForData(ranges, element, callback);
+    this._checkForData(ranges, element, options, callback);
   }
 
-  _checkForData(ranges, element, callback) {
+  _checkForData(ranges, element, options, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
@@ -78,7 +78,7 @@ export default class Presences {
         0
       ) > 0;
     if (hasActivities) {
-      this._initDataset(ranges, element, callback);
+      this._initDataset(ranges, element, options, callback);
     } else {
       document.querySelector(element).classList.remove('loading');
 
@@ -94,7 +94,7 @@ export default class Presences {
     }
   }
 
-  _initDataset(ranges, element, callback) {
+  _initDataset(ranges, element, options, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
@@ -119,25 +119,32 @@ export default class Presences {
     );
     gfxConfig.zoomLevel = this._zoomLevel(gfxConfig.min, gfxConfig.max);
 
-    this._setOptions(dataset, gfxConfig, element, callback);
+    this._setOptions(dataset, gfxConfig, element, options, callback);
   }
 
-  _setOptions(dataset, gfxConfig, element, callback) {
+  _setOptions(dataset, gfxConfig, element, options, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
     const self = this;
+    const isHeightSupplied =
+      Object.prototype.hasOwnProperty.call(options, 'height') && options.height;
 
-    const graphHeight = 35 * gfxConfig.rooms.length;
+    let graphHeight;
+    if (isHeightSupplied) {
+      graphHeight = options.height - 110;
+    } else {
+      graphHeight = 35 * gfxConfig.rooms.length;
+    }
 
     document
       .querySelector(element)
       .setAttribute(
         'style',
-        `${document
-          .querySelector(element)
-          .getAttribute('style')}; height: ${graphHeight + 140}px;`
+        `${document.querySelector(element).getAttribute('style')}; height: ${
+          isHeightSupplied ? graphHeight : graphHeight + 140
+        }px;`
       );
 
     this._chart = echarts.init(document.querySelector(element));
@@ -257,6 +264,10 @@ export default class Presences {
         }
       ]
     };
+
+    if (isHeightSupplied) {
+      this._option.grid.top = 0;
+    }
 
     if (this._option && typeof this._option === 'object') {
       if (document.querySelector(element) == null || this._destroyRequest) {
