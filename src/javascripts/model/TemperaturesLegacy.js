@@ -31,11 +31,7 @@ export default class TemperaturesLegacy {
   }
 
   async _fetchAndDraw(element, type, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -74,10 +70,7 @@ export default class TemperaturesLegacy {
         if (temperatures[theDate][key].temp > gfxConfig.max) {
           gfxConfig.max = temperatures[theDate][key].temp;
         }
-        dataset.push([
-          temperatures[theDate][key].createdAt,
-          temperatures[theDate][key].temp
-        ]);
+        dataset.push([temperatures[theDate][key].createdAt, temperatures[theDate][key].temp]);
       });
     });
 
@@ -106,9 +99,7 @@ export default class TemperaturesLegacy {
           animation: true
         },
         formatter(value) {
-          return `${moment(value[0].data[0]).format('HH:mm')} : ${
-            value[0].data[1]
-          }°C`;
+          return `${moment(value[0].data[0]).format('HH:mm')} : ${value[0].data[1]}°C`;
         }
       },
 

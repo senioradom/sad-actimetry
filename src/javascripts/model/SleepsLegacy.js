@@ -32,11 +32,7 @@ export default class SleepsLegacy {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -62,19 +58,13 @@ export default class SleepsLegacy {
       return;
     }
 
-    const hasActivities =
-      Object.values(sleeps).reduce(
-        (total, currentObj) => total + currentObj.details.length,
-        0
-      ) > 0;
+    const hasActivities = Object.values(sleeps).reduce((total, currentObj) => total + currentObj.details.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(sleeps, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -92,10 +82,7 @@ export default class SleepsLegacy {
     };
 
     Object.keys(sleeps).forEach(theDate => {
-      const duration =
-        (moment.duration(sleeps[theDate].duration).valueOf() /
-          (1000 * 60 * 60)) %
-        24;
+      const duration = (moment.duration(sleeps[theDate].duration).valueOf() / (1000 * 60 * 60)) % 24;
 
       dataset.push([theDate, duration, sleeps[theDate]]);
 
@@ -127,21 +114,15 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          ${I18n.strings[self._config.language].bedtime} : ${moment(
-            sleeps[0].data[2].start
-          )
+          ${I18n.strings[self._config.language].bedtime} : ${moment(sleeps[0].data[2].start)
             .tz(self._config.contract.timezone)
             .format('HH:mm')}<br>
-          ${I18n.strings[self._config.language].wakeup_time2} : ${moment(
-            sleeps[0].data[2].end
-          )
+          ${I18n.strings[self._config.language].wakeup_time2} : ${moment(sleeps[0].data[2].end)
             .tz(self._config.contract.timezone)
             .format('HH:mm')}<br>
           ${
             sleeps[0].data[2].wakeNumber > 0
-              ? `${I18n.strings[self._config.language].wokeup_at} ${
-                  sleeps[0].data[2].wakeNumber
-                } ${
+              ? `${I18n.strings[self._config.language].wokeup_at} ${sleeps[0].data[2].wakeNumber} ${
                   sleeps[0].data[2].wakeNumber > 1
                     ? `${I18n.strings[self._config.language].times}`
                     : `${I18n.strings[self._config.language].time}`

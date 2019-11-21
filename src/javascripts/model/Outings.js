@@ -32,11 +32,7 @@ export default class Outings {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -62,19 +58,13 @@ export default class Outings {
       return;
     }
 
-    const hasActivities =
-      Object.values(outings).reduce(
-        (total, currentObj) => total + currentObj.length,
-        0
-      ) > 0;
+    const hasActivities = Object.values(outings).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(outings, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -123,15 +113,11 @@ export default class Outings {
         formatter(outings) {
           let tooltip = '';
           outings[0].data[2].forEach((outing, index) => {
-            tooltip += `<b>${
-              I18n.strings[self._config.language].outing
-            } #${index + 1}</b> : ${
+            tooltip += `<b>${I18n.strings[self._config.language].outing} #${index + 1}</b> : ${
               I18n.strings[self._config.language].from
             } ${moment(outing.start)
               .tz(self._config.contract.timezone)
-              .format('HH:mm')} ${
-              I18n.strings[self._config.language].to
-            } ${moment(outing.end)
+              .format('HH:mm')} ${I18n.strings[self._config.language].to} ${moment(outing.end)
               .tz(self._config.contract.timezone)
               .format('HH:mm')}<br>`;
           });

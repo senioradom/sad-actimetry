@@ -32,11 +32,7 @@ export default class TemperaturesHeatmap {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -62,19 +58,13 @@ export default class TemperaturesHeatmap {
       return;
     }
 
-    const hasActivities =
-      Object.values(temperatures).reduce(
-        (total, currentObj) => total + currentObj.length,
-        0
-      ) > 0;
+    const hasActivities = Object.values(temperatures).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(temperatures, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -100,12 +90,7 @@ export default class TemperaturesHeatmap {
 
     Object.keys(temperatures).forEach(theDate => {
       if (Object.prototype.hasOwnProperty.call(temperatures, theDate)) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            temporaryTemperaturesObject,
-            theDate
-          )
-        ) {
+        if (!Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject, theDate)) {
           temporaryTemperaturesObject[theDate] = {};
           for (let hour = 0; hour <= 23; hour += 1) {
             temporaryTemperaturesObject[theDate][hour] = null;
@@ -127,12 +112,7 @@ export default class TemperaturesHeatmap {
     let dayIndex = 0;
 
     Object.keys(temporaryTemperaturesObject).forEach(theDate => {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          temporaryTemperaturesObject,
-          theDate
-        )
-      ) {
+      if (Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject, theDate)) {
         gfxConfig.days.push(
           moment(theDate)
             .tz(self._config.contract.timezone)
@@ -141,17 +121,8 @@ export default class TemperaturesHeatmap {
         );
 
         Object.keys(temporaryTemperaturesObject[theDate]).forEach(hour => {
-          if (
-            Object.prototype.hasOwnProperty.call(
-              temporaryTemperaturesObject[theDate],
-              hour
-            )
-          ) {
-            dataset.push([
-              dayIndex,
-              parseInt(hour, 10),
-              temporaryTemperaturesObject[theDate][hour]
-            ]);
+          if (Object.prototype.hasOwnProperty.call(temporaryTemperaturesObject[theDate], hour)) {
+            dataset.push([dayIndex, parseInt(hour, 10), temporaryTemperaturesObject[theDate][hour]]);
           }
         });
 

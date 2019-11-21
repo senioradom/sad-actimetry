@@ -42,11 +42,7 @@ export default class Presences {
   }
 
   async _fetchAndDraw(element, start, end, options, callback) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -73,18 +69,13 @@ export default class Presences {
     }
 
     const hasActivities =
-      Object.values(ranges.days).reduce(
-        (total, currentObj) => total + currentObj.activities.length,
-        0
-      ) > 0;
+      Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(ranges, element, options, callback);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
 
@@ -112,11 +103,7 @@ export default class Presences {
     gfxConfig.roomsMapping = rooms.mapping;
 
     let dataset = this._rangesToPresences(ranges, gfxConfig);
-    dataset = this._renameRoomsAndAddMask(
-      dataset,
-      gfxConfig,
-      moment(ranges.lastUpdate).valueOf()
-    );
+    dataset = this._renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.lastUpdate).valueOf());
     gfxConfig.zoomLevel = this._zoomLevel(gfxConfig.min, gfxConfig.max);
 
     this._setOptions(dataset, gfxConfig, element, options, callback);
@@ -128,8 +115,7 @@ export default class Presences {
     }
 
     const self = this;
-    const isHeightSupplied =
-      Object.prototype.hasOwnProperty.call(options, 'height') && options.height;
+    const isHeightSupplied = Object.prototype.hasOwnProperty.call(options, 'height') && options.height;
 
     let graphHeight;
     if (isHeightSupplied) {
@@ -234,9 +220,7 @@ export default class Presences {
         axisLabel: {
           formatter(val) {
             const theDatetime = moment(val).tz(self._config.contract.timezone);
-            return `${theDatetime.format('DD/MM')}\n${theDatetime.format(
-              'HH:mm'
-            )}`;
+            return `${theDatetime.format('DD/MM')}\n${theDatetime.format('HH:mm')}`;
           }
         }
       },
@@ -393,9 +377,7 @@ export default class Presences {
     return `<b>${objParam.roomName}</b><br>
                                 <hr>
                                 ${objParam.start} - ${objParam.end}<br>
-                                <b>${
-                                  I18n.strings[this._config.language].duration
-                                } :</b> ${objParam.duration}`;
+                                <b>${I18n.strings[this._config.language].duration} :</b> ${objParam.duration}`;
   }
 
   _renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
@@ -412,24 +394,20 @@ export default class Presences {
 
     gfxConfig.rooms.forEach((room, index) => {
       if (room.includes('PRESSURE_')) {
-        gfxConfig.rooms[index] = `${
-          I18n.strings[this._config.language].bed
-        } (${room.replace('PRESSURE_', '').toLowerCase()})`;
+        gfxConfig.rooms[index] = `${I18n.strings[this._config.language].bed} (${room
+          .replace('PRESSURE_', '')
+          .toLowerCase()})`;
       } else if (room.includes('DOOR_OPENING_')) {
-        gfxConfig.rooms[index] = `${
-          I18n.strings[this._config.language].door
-        } (${room.replace('DOOR_OPENING_', '').toLowerCase()})`;
+        gfxConfig.rooms[index] = `${I18n.strings[this._config.language].door} (${room
+          .replace('DOOR_OPENING_', '')
+          .toLowerCase()})`;
       } else {
         gfxConfig.rooms[index] = room
           .replace('PRESENCE_', '')
           .replace('OUTING_', I18n.strings[this._config.language].outings);
       }
 
-      gfxConfig.rooms[index] = StringUtils.truncate(
-        gfxConfig.rooms[index],
-        this._isMobile ? 14 : 25,
-        false
-      );
+      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 14 : 25, false);
 
       if (lastUpdate <= gfxConfig.max) {
         presences.push(
@@ -465,11 +443,7 @@ export default class Presences {
           }
         }
 
-        if (
-          !['PRESENCE', 'PRESSURE', 'DOOR_OPENING', 'OUTING'].includes(
-            activity.rangeType
-          )
-        ) {
+        if (!['PRESENCE', 'PRESSURE', 'DOOR_OPENING', 'OUTING'].includes(activity.rangeType)) {
           return;
         }
 
@@ -480,16 +454,12 @@ export default class Presences {
               : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start).format('HH:mm:ss'),
           end: moment(activity.end).format('HH:mm:ss'),
-          duration: moment
-            .utc(moment.duration(activity.duration).as('milliseconds'))
-            .format('HH:mm:ss')
+          duration: moment.utc(moment.duration(activity.duration).as('milliseconds')).format('HH:mm:ss')
         });
 
         if (['DOOR_OPENING'].includes(activity.rangeType)) {
           if (moment.duration(activity.duration).valueOf() < 60 * 1000) {
-            ranges.days[theDate].activities[index].displayEnd = moment(
-              activity.displayStart
-            )
+            ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart)
               .add(60, 'seconds')
               .utc()
               .format('YYYY-MM-DDTHH:mm:ss.SSSZ');

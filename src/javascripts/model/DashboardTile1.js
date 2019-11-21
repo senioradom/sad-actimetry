@@ -32,11 +32,7 @@ export default class DashboardTile1 {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -63,18 +59,13 @@ export default class DashboardTile1 {
     }
 
     const hasActivities =
-      Object.values(activitiesPerRoom).reduce(
-        (total, currentObj) => total + currentObj.rooms.length,
-        0
-      ) > 0;
+      Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(activitiesPerRoom, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -106,15 +97,11 @@ export default class DashboardTile1 {
             roomIds.push(presence.room);
           }
 
-          if (
-            !Object.prototype.hasOwnProperty.call(rawDataset, presence.room)
-          ) {
+          if (!Object.prototype.hasOwnProperty.call(rawDataset, presence.room)) {
             rawDataset[presence.room] = [];
           }
 
-          rawDataset[presence.room].push(
-            moment.duration(presence.duration).valueOf()
-          );
+          rawDataset[presence.room].push(moment.duration(presence.duration).valueOf());
         });
       }
     });
@@ -123,9 +110,7 @@ export default class DashboardTile1 {
 
     const dataset = [];
     roomIds.forEach(roomId => {
-      const roomLabel = self._config.contract.rooms.filter(
-        room => room.id === roomId
-      )[0].label;
+      const roomLabel = self._config.contract.rooms.filter(room => room.id === roomId)[0].label;
       gfxConfig.rooms.push(roomLabel);
 
       dataset.push({
@@ -201,20 +186,13 @@ export default class DashboardTile1 {
           scale: true,
           axisLabel: {
             formatter(value) {
-              let roundedMinutes =
-                Math.floor(
-                  moment
-                    .utc(moment.duration(value).as('milliseconds'))
-                    .minute() / 30
-                ) * 30;
+              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
 
               if (!roundedMinutes) {
                 roundedMinutes = '00';
               }
 
-              return moment
-                .utc(moment.duration(value).as('milliseconds'))
-                .format(`HH[h${roundedMinutes}]`);
+              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
             }
           },
           splitArea: {

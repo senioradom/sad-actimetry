@@ -32,11 +32,7 @@ export default class Sleeps {
   }
 
   async _fetchAndDraw(element) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -63,15 +59,7 @@ export default class Sleeps {
           '2019-06-12T00:00:00+0200',
           '2019-06-13T00:00:00+0200'
         ],
-        sleepsDurations: [
-          'PT7H19M27S',
-          'PT6H22M',
-          'PT8H29M22S',
-          'PT4H5M58S',
-          'PT7H51M56S',
-          'PT8H55M15S',
-          'PT5H3M52S'
-        ],
+        sleepsDurations: ['PT7H19M27S', 'PT6H22M', 'PT8H29M22S', 'PT4H5M58S', 'PT7H51M56S', 'PT8H55M15S', 'PT5H3M52S'],
         sleepsDurationsDailyAverages: [
           'PT6H50M50S',
           'PT9H59M19S',
@@ -97,15 +85,11 @@ export default class Sleeps {
     };
 
     dataset.sleepsDurations.forEach((value, key) => {
-      dataset.sleepsDurations[key] = moment
-        .utc(moment.duration(value).as('milliseconds'))
-        .valueOf();
+      dataset.sleepsDurations[key] = moment.utc(moment.duration(value).as('milliseconds')).valueOf();
     });
 
     dataset.sleepsDurationsDailyAverages.forEach((value, key) => {
-      dataset.sleepsDurationsDailyAverages[key] = moment
-        .utc(moment.duration(value).as('milliseconds'))
-        .valueOf();
+      dataset.sleepsDurationsDailyAverages[key] = moment.utc(moment.duration(value).as('milliseconds')).valueOf();
     });
 
     this._setOptions(dataset, gfxConfig, element);
@@ -129,8 +113,7 @@ export default class Sleeps {
           animation: true
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        extraCssText:
-          'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
+        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
         position(pos) {
           return {
             top: 10,
@@ -146,11 +129,9 @@ export default class Sleeps {
 <p>${I18n.strings[self._config.language].sleep_duration} : <strong>${moment
             .utc(moment.duration(params[0].value).as('milliseconds'))
             .format('HH[h]mm')}</strong></p>
-<p>${I18n.strings[self._config.language].averages} ${moment(
-            params[0].axisValue
-          ).format('dddd')} : <strong>${moment(params[1].value).format(
-            'HH[h]mm'
-          )}</strong></p>
+<p>${I18n.strings[self._config.language].averages} ${moment(params[0].axisValue).format('dddd')} : <strong>${moment(
+            params[1].value
+          ).format('HH[h]mm')}</strong></p>
 </div>
 `;
           return htmlTooltip;
@@ -183,20 +164,13 @@ export default class Sleeps {
           },
           axisLabel: {
             formatter(value) {
-              let roundedMinutes =
-                Math.floor(
-                  moment
-                    .utc(moment.duration(value).as('milliseconds'))
-                    .minute() / 30
-                ) * 30;
+              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
 
               if (!roundedMinutes) {
                 roundedMinutes = '00';
               }
 
-              return moment
-                .utc(moment.duration(value).as('milliseconds'))
-                .format(`HH[h${roundedMinutes}]`);
+              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
             }
           }
         }

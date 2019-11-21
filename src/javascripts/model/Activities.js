@@ -32,11 +32,7 @@ export default class Activities {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -68,9 +64,7 @@ export default class Activities {
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -119,9 +113,7 @@ export default class Activities {
           animation: true
         },
         formatter(value) {
-          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${
-            value[0].data[1]
-          }`;
+          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${value[0].data[1]}`;
         }
       },
 

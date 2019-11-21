@@ -32,11 +32,7 @@ export default class PresencesAndSleep {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -63,18 +59,13 @@ export default class PresencesAndSleep {
     }
 
     const hasActivities =
-      Object.values(roomsAndSleeps).reduce(
-        (total, currentObj) => total + currentObj.rooms.length,
-        0
-      ) > 0;
+      Object.values(roomsAndSleeps).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(roomsAndSleeps, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -107,25 +98,16 @@ export default class PresencesAndSleep {
             roomIds.push(presence.room);
           }
 
-          if (
-            !Object.prototype.hasOwnProperty.call(
-              rawDataset.rooms,
-              presence.room
-            )
-          ) {
+          if (!Object.prototype.hasOwnProperty.call(rawDataset.rooms, presence.room)) {
             rawDataset.rooms[presence.room] = [];
           }
 
-          rawDataset.rooms[presence.room].push(
-            moment.duration(presence.duration).valueOf()
-          );
+          rawDataset.rooms[presence.room].push(moment.duration(presence.duration).valueOf());
         });
       }
 
       if (roomsAndSleeps[theDate].sleep) {
-        rawDataset.sleep.push(
-          moment.duration(roomsAndSleeps[theDate].sleep.duration).valueOf()
-        );
+        rawDataset.sleep.push(moment.duration(roomsAndSleeps[theDate].sleep.duration).valueOf());
 
         gfxConfig.tooltips[theDate] = roomsAndSleeps[theDate].sleep;
       } else {
@@ -139,9 +121,7 @@ export default class PresencesAndSleep {
 
     const dataset = [];
     roomIds.forEach(roomId => {
-      const roomLabel = self._config.contract.rooms.filter(
-        room => room.id === roomId
-      )[0].label;
+      const roomLabel = self._config.contract.rooms.filter(room => room.id === roomId)[0].label;
       gfxConfig.rooms.push(roomLabel);
 
       dataset.push({
@@ -253,8 +233,7 @@ export default class PresencesAndSleep {
           animation: true
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        extraCssText:
-          'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
+        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
         position(pos) {
           return {
             top: 10,
@@ -269,38 +248,29 @@ export default class PresencesAndSleep {
 
           let htmlTooltip = `<div class="presences-and-sleep-tooltip">
           <p class="header header--activities">
-          <i class="icon-activities"></i> ${
-            I18n.strings[self._config.language].presences
-          }
+          <i class="icon-activities"></i> ${I18n.strings[self._config.language].presences}
           </p>`;
           activites.forEach(item => {
-            htmlTooltip += `<p>${item.seriesName}: <strong>${moment
-              .utc(item.data)
-              .format('HH[h]mm')}</strong></p>`;
+            htmlTooltip += `<p>${item.seriesName}: <strong>${moment.utc(item.data).format('HH[h]mm')}</strong></p>`;
           });
 
           if (sleep) {
             htmlTooltip += `
             <p class="header header--sleeps">
-            <i class="icon-sleeps"></i> ${
-              I18n.strings[self._config.language].sleep
-            }
+            <i class="icon-sleeps"></i> ${I18n.strings[self._config.language].sleep}
             </p>
-            <p>${
-              I18n.strings[self._config.language].duration
-            } : <strong>${moment
+            <p>${I18n.strings[self._config.language].duration} : <strong>${moment
               .utc(moment.duration(sleep.duration).as('milliseconds'))
               .format('HH[h]mm')}</strong></p>
-            <p>${
-              I18n.strings[self._config.language].bedtime
-            } : <strong>${moment(sleep.start).format('HH[h]mm')}</strong></p>
-            <p>${
-              I18n.strings[self._config.language].wakeup_time
-            } : <strong>${moment(sleep.end).format('HH[h]mm')}</strong></p>
-            <p>${
-              I18n.strings[self._config.language]
-                .number_of_wakeups_during_the_night
-            } : <strong>${sleep.wakeNumber}</strong></p>
+            <p>${I18n.strings[self._config.language].bedtime} : <strong>${moment(sleep.start).format(
+              'HH[h]mm'
+            )}</strong></p>
+            <p>${I18n.strings[self._config.language].wakeup_time} : <strong>${moment(sleep.end).format(
+              'HH[h]mm'
+            )}</strong></p>
+            <p>${I18n.strings[self._config.language].number_of_wakeups_during_the_night} : <strong>${
+              sleep.wakeNumber
+            }</strong></p>
             </div>`;
           }
 
@@ -369,20 +339,13 @@ export default class PresencesAndSleep {
           scale: true,
           axisLabel: {
             formatter(value) {
-              let roundedMinutes =
-                Math.floor(
-                  moment
-                    .utc(moment.duration(value).as('milliseconds'))
-                    .minute() / 30
-                ) * 30;
+              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
 
               if (!roundedMinutes) {
                 roundedMinutes = '00';
               }
 
-              return moment
-                .utc(moment.duration(value).as('milliseconds'))
-                .format(`HH[h${roundedMinutes}]`);
+              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
             }
           },
           splitArea: {

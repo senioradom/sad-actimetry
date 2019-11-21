@@ -32,11 +32,7 @@ export default class MovesPerRoom {
   }
 
   async _fetchAndDraw(element, start, end) {
-    if (
-      !this._config.contract ||
-      document.querySelector(element) == null ||
-      this._destroyRequest
-    ) {
+    if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
@@ -63,18 +59,13 @@ export default class MovesPerRoom {
     }
 
     const hasActivities =
-      Object.values(movesPerRoom.moves).reduce(
-        (total, currentObj) => total + currentObj.length,
-        0
-      ) > 0;
+      Object.values(movesPerRoom.moves).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(movesPerRoom, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(
-        element
-      ).innerHTML = `<div class="actimetry__no-data">${
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
         I18n.strings[this._config.language].no_data
       }</div>`;
     }
@@ -158,8 +149,7 @@ export default class MovesPerRoom {
           animation: true
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        extraCssText:
-          'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
+        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
         position(pos) {
           return {
             top: 10,
@@ -167,9 +157,7 @@ export default class MovesPerRoom {
           };
         },
         formatter(params) {
-          const beneficiary = self._config.contract.persons.filter(
-            p => p.roles.indexOf('beneficiary') > -1
-          );
+          const beneficiary = self._config.contract.persons.filter(p => p.roles.indexOf('beneficiary') > -1);
 
           let totalMoves = 0;
           params.forEach(item => {
@@ -177,20 +165,14 @@ export default class MovesPerRoom {
           });
 
           let htmlTooltip = '<div style="color:black;">';
-          htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(
-            params[0].data[0]
-          ).format('DD/MM/YYYY')} - ${totalMoves} ${
-            I18n.strings[self._config.language].total_moves
-          }</p>`;
-          htmlTooltip += `<p>${
-            I18n.strings[self._config.language].this_month
-          } ${
-            beneficiary.length
-              ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}`
-              : ''
-          } ${I18n.strings[self._config.language].was_detected} <strong>${
-            self._numberOfMovesThisMonth
-          }</strong> ${I18n.strings[self._config.language].times_2}.</p>`;
+          htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(params[0].data[0]).format(
+            'DD/MM/YYYY'
+          )} - ${totalMoves} ${I18n.strings[self._config.language].total_moves}</p>`;
+          htmlTooltip += `<p>${I18n.strings[self._config.language].this_month} ${
+            beneficiary.length ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}` : ''
+          } ${I18n.strings[self._config.language].was_detected} <strong>${self._numberOfMovesThisMonth}</strong> ${
+            I18n.strings[self._config.language].times_2
+          }.</p>`;
 
           params.forEach(item => {
             const rez = `<p>${item.data[2]}: <strong>${item.data[1]} ${

@@ -6,10 +6,6 @@ export default class StringUtils {
 
     const subString = str.substr(0, maxLength - 1);
 
-    return `${
-      useWordBoundary
-        ? subString.substr(0, subString.lastIndexOf(' '))
-        : subString
-    }...`;
+    return `${useWordBoundary ? subString.substr(0, subString.lastIndexOf(' ')) : subString}...`;
   }
 }
