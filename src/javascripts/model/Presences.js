@@ -452,8 +452,12 @@ export default class Presences {
             activity.rangeType === 'OUTING'
               ? I18n.strings[this._config.language].outings
               : gfxConfig.roomsMapping.idLabel[activity.room],
-          start: moment(activity.start).format('HH:mm:ss'),
-          end: moment(activity.end).format('HH:mm:ss'),
+          start: moment(activity.start)
+            .tz(this._config.contract.timezone)
+            .format('HH:mm:ss'),
+          end: moment(activity.end)
+            .tz(this._config.contract.timezone)
+            .format('HH:mm:ss'),
           duration: moment.utc(moment.duration(activity.duration).as('milliseconds')).format('HH:mm:ss')
         });
 
