@@ -91,7 +91,7 @@ export default class Presences {
     }
 
     this._width = document.querySelector(element).offsetWidth;
-    this._isMobile = document.defaultView.innerWidth <= 768;
+    this._isMobile = this._width <= 768;
 
     const gfxConfig = {
       min: Number.MAX_SAFE_INTEGER,
@@ -407,7 +407,7 @@ export default class Presences {
           .replace('OUTING_', I18n.strings[this._config.language].outings);
       }
 
-      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 14 : 25, false);
+      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 13 : 25, false);
 
       if (lastUpdate <= gfxConfig.max) {
         presences.push(
