@@ -407,7 +407,7 @@ export default class Presences {
           .replace('OUTING_', I18n.strings[this._config.language].outings);
       }
 
-      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 13 : 25, false);
+      gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 13 : 24, false);
 
       if (lastUpdate <= gfxConfig.max) {
         presences.push(
