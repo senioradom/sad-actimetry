@@ -41,3 +41,4 @@ $RECYCLE.BIN/
 /package-lock.json
 bower_components/
 .csscomb.json
+*.iml
