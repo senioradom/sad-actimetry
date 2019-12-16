@@ -84,7 +84,9 @@
 
     actimetry.movesPerRoom.draw('#moves-per-room', oneWeekAgo, todayAtEndOfDay);
 
-    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
+    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {}, () => {
+      console.log('Optional callback...');
+    });
 
     actimetry.temperatures.draw('#temperatures', oneWeekAgo, now);
 
