@@ -272,7 +272,7 @@ export default class Presences {
     };
 
     const sorted = (() => {
-      const sortedRoomsArray = [[], [], [], ['OUTING_']];
+      const sortedRoomsArray = [[], [], [], ['outing_']];
 
       this._config.contract.rooms.forEach(room => {
         mapping.idLabel[room.id] = room.label;
@@ -281,13 +281,13 @@ export default class Presences {
         room.sensors.forEach(sensor => {
           switch (sensor.category) {
             case 'motion':
-              sortedRoomsArray[0].push(`PRESENCE_${room.label}`);
+              sortedRoomsArray[0].push(`presence_${room.label}`);
               break;
             case 'bed':
-              sortedRoomsArray[1].push(`PRESSURE_${room.label}`);
+              sortedRoomsArray[1].push(`pressure_${room.label}`);
               break;
             case 'door':
-              sortedRoomsArray[2].push(`DOOR_OPENING_${room.label}`);
+              sortedRoomsArray[2].push(`door_opening_${room.label}`);
               break;
             default:
               break;
@@ -344,24 +344,24 @@ export default class Presences {
       hover: ''
     };
 
-    switch (rangeType) {
-      case 'PRESENCE':
+    switch (rangeType.toLowerCase()) {
+      case 'presence':
         colors.normal = '#8abd36';
         colors.hover = '#95cf4b';
         break;
-      case 'DOOR_OPENING':
+      case 'door_opening':
         colors.normal = '#ec6321';
         colors.hover = '#ec6321';
         break;
-      case 'OUTING':
+      case 'outing':
         colors.normal = '#0eaea8';
         colors.hover = '#0eaea8';
         break;
-      case 'PRESSURE':
+      case 'pressure':
         colors.normal = '#6b9519';
         colors.hover = '#6b9519';
         break;
-      case 'MASK':
+      case 'mask':
         colors.normal = '#8f8f8f';
         colors.hover = '#8f8f8f';
         break;
@@ -393,18 +393,18 @@ export default class Presences {
     });
 
     gfxConfig.rooms.forEach((room, index) => {
-      if (room.includes('PRESSURE_')) {
+      if (room.includes('pressure_')) {
         gfxConfig.rooms[index] = `${I18n.strings[this._config.language].bed} (${room
-          .replace('PRESSURE_', '')
+          .replace('pressure_', '')
           .toLowerCase()})`;
-      } else if (room.includes('DOOR_OPENING_')) {
+      } else if (room.includes('door_opening_')) {
         gfxConfig.rooms[index] = `${I18n.strings[this._config.language].door} (${room
-          .replace('DOOR_OPENING_', '')
+          .replace('door_opening_', '')
           .toLowerCase()})`;
       } else {
         gfxConfig.rooms[index] = room
-          .replace('PRESENCE_', '')
-          .replace('OUTING_', I18n.strings[this._config.language].outings);
+          .replace('presence_', '')
+          .replace('outing_', I18n.strings[this._config.language].outings);
       }
 
       gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 13 : 24, false);
@@ -443,13 +443,13 @@ export default class Presences {
           }
         }
 
-        if (!['PRESENCE', 'PRESSURE', 'DOOR_OPENING', 'OUTING'].includes(activity.rangeType)) {
+        if (!['presence', 'pressure', 'door_opening', 'outing'].includes(activity.rangeType)) {
           return;
         }
 
         const tooltip = this._tooltip({
           roomName:
-            activity.rangeType === 'OUTING'
+            activity.rangeType === 'outing'
               ? I18n.strings[this._config.language].outings
               : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start)
@@ -461,7 +461,7 @@ export default class Presences {
           duration: moment.utc(moment.duration(activity.duration).as('milliseconds')).format('HH:mm:ss')
         });
 
-        if (['DOOR_OPENING'].includes(activity.rangeType)) {
+        if (['door_opening'].includes(activity.rangeType)) {
           if (moment.duration(activity.duration).valueOf() < 60 * 1000) {
             ranges.days[theDate].activities[index].displayEnd = moment(activity.displayStart)
               .add(60, 'seconds')
