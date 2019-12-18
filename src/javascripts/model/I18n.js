@@ -121,7 +121,7 @@ class I18n {
         wokeup_at: 'vstal',
         no_data: 'Za príslušné obdobie neexistujú žiadne údaje.'
       },
-      cz: {
+      cs: {
         averages: 'Průměry',
         bed: 'Lůžko',
         bedtime: 'Čas na spaní',
