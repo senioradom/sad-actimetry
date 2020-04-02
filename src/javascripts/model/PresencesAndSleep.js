@@ -247,6 +247,9 @@ export default class PresencesAndSleep {
           sleep = self._tooltips[sleep[0].axisValue];
 
           let htmlTooltip = `<div class="presences-and-sleep-tooltip">
+          <p style="font-weight:bold;color: #00827d;font-size:14px;">
+          ${moment(params[0].name, 'YYYY-MM-DD').format('DD/MM/YYYY')}
+          </p>
           <p class="header header--activities">
           <i class="icon-activities"></i> ${I18n.strings[self._config.language].presences}
           </p>`;
