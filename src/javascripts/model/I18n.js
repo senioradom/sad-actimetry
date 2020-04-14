@@ -180,6 +180,36 @@ class I18n {
         wakeup_time: '起床时间',
         wokeup_at: '起床于',
         no_data: '在所选期间内无任何数据'
+      },
+      de: {
+        averages: 'Durchschnitt von',
+        bed: 'Bett',
+        bedtime: 'Schlafenszeit',
+        daily_sleep_duration: 'Tägliche Schlafdauer',
+        didnt_wake_up_at_night: 'Kein Aufstehen während der Nacht',
+        door: 'Tür',
+        duration: 'Dauer',
+        from: 'von',
+        moves: 'Bewegungen',
+        number_of_wakeups_during_the_night: 'Anzahl nächtlicher Aufstände',
+        this_month: 'In diesem Monat wurde der Begünstigte',
+        was_detected: '',
+        outing: 'Ausfahrt',
+        outings: 'Ausfahrten',
+        presences: 'Präsenzen',
+        sleep: 'Schlaf',
+        sleep_duration: 'Schlafdauer',
+        temperatures_24h: 'Temperaturen (24h)',
+        temperatures_week: 'Temperaturen (Wochen)',
+        time: 'Mal',
+        times: 'Mal',
+        times_2: 'Mal entdeckt',
+        to: 'bis',
+        total_moves: 'Bewegungen insgesamt',
+        wakeup_time2: 'Anstiegszeit',
+        wakeup_time: 'Aufwachzeit',
+        wokeup_at: 'auf wachte um',
+        no_data: 'Für den betreffenden Zeitraum liegen keine Daten vor.'
       }
     };
   }
