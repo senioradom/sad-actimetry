@@ -1,6 +1,5 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
 
 export default class Outings {
@@ -117,9 +116,9 @@ export default class Outings {
               I18n.strings[self._config.language].from
             } ${moment(outing.start)
               .tz(self._config.contract.timezone)
-              .format('HH:mm')} ${I18n.strings[self._config.language].to} ${moment(outing.end)
+              .format('LT')} ${I18n.strings[self._config.language].to} ${moment(outing.end)
               .tz(self._config.contract.timezone)
-              .format('HH:mm')}<br>`;
+              .format('LT')}<br>`;
           });
 
           return tooltip;

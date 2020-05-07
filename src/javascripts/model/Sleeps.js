@@ -1,7 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
+import StringUtils from '../StringUtils';
 
 export default class Sleeps {
   constructor(config) {
@@ -85,11 +85,11 @@ export default class Sleeps {
     };
 
     dataset.sleepsDurations.forEach((value, key) => {
-      dataset.sleepsDurations[key] = moment.utc(moment.duration(value).as('milliseconds')).valueOf();
+      dataset.sleepsDurations[key] = moment.duration(value).asMilliseconds();
     });
 
     dataset.sleepsDurationsDailyAverages.forEach((value, key) => {
-      dataset.sleepsDurationsDailyAverages[key] = moment.utc(moment.duration(value).as('milliseconds')).valueOf();
+      dataset.sleepsDurationsDailyAverages[key] = moment.duration(value).asMilliseconds();
     });
 
     this._setOptions(dataset, gfxConfig, element);
@@ -126,12 +126,13 @@ export default class Sleeps {
 <p class="header">Le ${moment(params[0].axisValue).format('DD/MM/YYYY')}</p>
 `;
           htmlTooltip += `
-<p>${I18n.strings[self._config.language].sleep_duration} : <strong>${moment
-            .utc(moment.duration(params[0].value).as('milliseconds'))
-            .format('HH[h]mm')}</strong></p>
-<p>${I18n.strings[self._config.language].averages} ${moment(params[0].axisValue).format('dddd')} : <strong>${moment(
-            params[1].value
-          ).format('HH[h]mm')}</strong></p>
+<p>${I18n.strings[self._config.language].sleep_duration} : <strong>${StringUtils.formatDuration(
+            moment.duration(params[0].value),
+            false
+          )}</strong></p>
+<p>${I18n.strings[self._config.language].averages} ${moment(params[0].axisValue).format(
+            'dddd'
+          )} : <strong>${StringUtils.formatDuration(moment.duration(params[1].value), false)}</strong></p>
 </div>
 `;
           return htmlTooltip;
@@ -164,13 +165,7 @@ export default class Sleeps {
           },
           axisLabel: {
             formatter(value) {
-              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
-
-              if (!roundedMinutes) {
-                roundedMinutes = '00';
-              }
-
-              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
+              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
             }
           }
         }

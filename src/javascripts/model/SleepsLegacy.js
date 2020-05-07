@@ -1,6 +1,5 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
 
 export default class SleepsLegacy {
@@ -116,10 +115,10 @@ export default class SleepsLegacy {
           return `
           ${I18n.strings[self._config.language].bedtime} : ${moment(sleeps[0].data[2].start)
             .tz(self._config.contract.timezone)
-            .format('HH:mm')}<br>
+            .format('LT')}<br>
           ${I18n.strings[self._config.language].wakeup_time2} : ${moment(sleeps[0].data[2].end)
             .tz(self._config.contract.timezone)
-            .format('HH:mm')}<br>
+            .format('LT')}<br>
           ${
             sleeps[0].data[2].wakeNumber > 0
               ? `${I18n.strings[self._config.language].wokeup_at} ${sleeps[0].data[2].wakeNumber} ${

@@ -1,7 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
+import StringUtils from '../StringUtils';
 
 export default class PresencesAndSleep {
   constructor(config) {
@@ -254,7 +254,10 @@ export default class PresencesAndSleep {
           <i class="icon-activities"></i> ${I18n.strings[self._config.language].presences}
           </p>`;
           activites.forEach(item => {
-            htmlTooltip += `<p>${item.seriesName}: <strong>${moment.utc(item.data).format('HH[h]mm')}</strong></p>`;
+            htmlTooltip += `<p>${item.seriesName}: <strong>${StringUtils.formatDuration(
+              moment.duration(item.data),
+              false
+            )}</strong></p>`;
           });
 
           if (sleep) {
@@ -262,14 +265,12 @@ export default class PresencesAndSleep {
             <p class="header header--sleeps">
             <i class="icon-sleeps"></i> ${I18n.strings[self._config.language].sleep}
             </p>
-            <p>${I18n.strings[self._config.language].duration} : <strong>${moment
-              .utc(moment.duration(sleep.duration).as('milliseconds'))
-              .format('HH[h]mm')}</strong></p>
-            <p>${I18n.strings[self._config.language].bedtime} : <strong>${moment(sleep.start).format(
-              'HH[h]mm'
+            <p>${I18n.strings[self._config.language].duration} : <strong>${StringUtils.formatDuration(
+              moment.duration(sleep.duration, false)
             )}</strong></p>
+            <p>${I18n.strings[self._config.language].bedtime} : <strong>${moment(sleep.start).format('LT')}</strong></p>
             <p>${I18n.strings[self._config.language].wakeup_time} : <strong>${moment(sleep.end).format(
-              'HH[h]mm'
+              'LT'
             )}</strong></p>
             <p>${I18n.strings[self._config.language].number_of_wakeups_during_the_night} : <strong>${
               sleep.wakeNumber
@@ -342,13 +343,7 @@ export default class PresencesAndSleep {
           scale: true,
           axisLabel: {
             formatter(value) {
-              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
-
-              if (!roundedMinutes) {
-                roundedMinutes = '00';
-              }
-
-              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
+              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
             }
           },
           splitArea: {

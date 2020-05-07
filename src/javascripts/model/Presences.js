@@ -1,6 +1,5 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
 import StringUtils from '../StringUtils';
 
@@ -220,7 +219,7 @@ export default class Presences {
         axisLabel: {
           formatter(val) {
             const theDatetime = moment(val).tz(self._config.contract.timezone);
-            return `${theDatetime.format('DD/MM')}\n${theDatetime.format('HH:mm')}`;
+            return `${theDatetime.format('L')}\n${theDatetime.format('LT')}`;
           }
         }
       },
@@ -454,11 +453,11 @@ export default class Presences {
               : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start)
             .tz(this._config.contract.timezone)
-            .format('HH:mm:ss'),
+            .format('LT'),
           end: moment(activity.end)
             .tz(this._config.contract.timezone)
-            .format('HH:mm:ss'),
-          duration: moment.utc(moment.duration(activity.duration).as('milliseconds')).format('HH:mm:ss')
+            .format('LT'),
+          duration: StringUtils.formatDuration(moment.duration(activity.duration), true)
         });
 
         if (['door_opening'].includes(activity.rangeType)) {

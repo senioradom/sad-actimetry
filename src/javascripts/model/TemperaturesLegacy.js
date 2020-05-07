@@ -1,6 +1,5 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 
 export default class TemperaturesLegacy {
   constructor(config) {
@@ -99,7 +98,7 @@ export default class TemperaturesLegacy {
           animation: true
         },
         formatter(value) {
-          return `${moment(value[0].data[0]).format('HH:mm')} : ${value[0].data[1]}°C`;
+          return `${moment(value[0].data[0]).format('LT')} : ${value[0].data[1]}°C`;
         }
       },
 
@@ -111,7 +110,7 @@ export default class TemperaturesLegacy {
           boundaryGap: false,
           axisLabel: {
             formatter(value) {
-              return moment(value).format(type === 'week' ? 'DD/MM' : 'HH');
+              return moment(value).format(type === 'week' ? 'L' : 'LT');
             }
           }
         }

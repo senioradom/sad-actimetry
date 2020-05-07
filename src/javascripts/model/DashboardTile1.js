@@ -1,7 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
+import StringUtils from '../StringUtils';
 
 export default class DashboardTile1 {
   constructor(config) {
@@ -186,13 +186,7 @@ export default class DashboardTile1 {
           scale: true,
           axisLabel: {
             formatter(value) {
-              let roundedMinutes = Math.floor(moment.utc(moment.duration(value).as('milliseconds')).minute() / 30) * 30;
-
-              if (!roundedMinutes) {
-                roundedMinutes = '00';
-              }
-
-              return moment.utc(moment.duration(value).as('milliseconds')).format(`HH[h${roundedMinutes}]`);
+              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
             }
           },
           splitArea: {

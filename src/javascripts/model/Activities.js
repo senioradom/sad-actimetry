@@ -1,6 +1,5 @@
 import echarts from 'echarts/dist/echarts.min';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import I18n from './I18n';
 
 export default class Activities {
@@ -113,7 +112,7 @@ export default class Activities {
           animation: true
         },
         formatter(value) {
-          return `${moment(value[0].data[0]).format('DD/MM HH:mm')} : ${value[0].data[1]}`;
+          return `${moment(value[0].data[0]).format('L LT')} : ${value[0].data[1]}`;
         }
       },
 
@@ -124,7 +123,7 @@ export default class Activities {
           boundaryGap: false,
           axisLabel: {
             formatter(value) {
-              return moment(value).format('DD/MM HH:MM');
+              return moment(value).format('L LT');
             }
           }
         }

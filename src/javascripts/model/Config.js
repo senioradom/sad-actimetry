@@ -1,5 +1,4 @@
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 
 export default class Config {
   constructor(settings) {
