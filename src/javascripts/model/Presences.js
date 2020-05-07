@@ -453,10 +453,10 @@ export default class Presences {
               : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start)
             .tz(this._config.contract.timezone)
-            .format('LT'),
+            .format('LTS'),
           end: moment(activity.end)
             .tz(this._config.contract.timezone)
-            .format('LT'),
+            .format('LTS'),
           duration: StringUtils.formatDuration(moment.duration(activity.duration), true)
         });
 
