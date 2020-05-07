@@ -183,10 +183,16 @@ export default class DashboardTile1 {
       ],
       yAxis: [
         {
-          scale: true,
+          min: 0,
+          max(value) {
+            let minutes = moment.duration(value.max).asMinutes() + 30;
+            minutes = (Math.floor(minutes / 150) + 1) * 150;
+            return moment.duration(minutes, 'minutes').asMilliseconds();
+          },
+          interval: 9000000,
           axisLabel: {
             formatter(value) {
-              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
+              return StringUtils.formatDuration(value, false);
             }
           },
           splitArea: {

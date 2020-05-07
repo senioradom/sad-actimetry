@@ -25,10 +25,4 @@ export default class StringUtils {
 
     return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   }
-
-  static roundHalfTime(time, timezone) {
-    let m = moment(time).tz(timezone);
-    m = m.minute((m.minute() / 30) * 30);
-    return m.format('LT');
-  }
 }

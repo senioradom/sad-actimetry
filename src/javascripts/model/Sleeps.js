@@ -132,7 +132,7 @@ export default class Sleeps {
           )}</strong></p>
 <p>${I18n.strings[self._config.language].averages} ${moment(params[0].axisValue).format(
             'dddd'
-          )} : <strong>${StringUtils.formatDuration(moment.duration(params[1].value), false)}</strong></p>
+          )} : <strong>${StringUtils.formatDuration(params[1].value, false)}</strong></p>
 </div>
 `;
           return htmlTooltip;
@@ -157,15 +157,22 @@ export default class Sleeps {
       ],
       yAxis: [
         {
+          min: 0,
+          max(value) {
+            let minutes = moment.duration(value.max).asMinutes() + 30;
+            minutes = (Math.floor(minutes / 150) + 1) * 150;
+            return moment.duration(minutes, 'minutes').asMilliseconds();
+          },
+          interval: 9000000,
+          axisLabel: {
+            formatter(value) {
+              return StringUtils.formatDuration(value, false);
+            }
+          },
           type: 'value',
           axisLine: {
             lineStyle: {
               color: '#222'
-            }
-          },
-          axisLabel: {
-            formatter(value) {
-              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
             }
           }
         }

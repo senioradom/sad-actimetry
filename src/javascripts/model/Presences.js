@@ -457,7 +457,7 @@ export default class Presences {
           end: moment(activity.end)
             .tz(this._config.contract.timezone)
             .format('LTS'),
-          duration: StringUtils.formatDuration(moment.duration(activity.duration), true)
+          duration: StringUtils.formatDuration(activity.duration, true)
         });
 
         if (['door_opening'].includes(activity.rangeType)) {

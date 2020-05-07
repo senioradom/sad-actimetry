@@ -255,7 +255,7 @@ export default class PresencesAndSleep {
           </p>`;
           activites.forEach(item => {
             htmlTooltip += `<p>${item.seriesName}: <strong>${StringUtils.formatDuration(
-              moment.duration(item.data),
+              item.data,
               false
             )}</strong></p>`;
           });
@@ -266,7 +266,8 @@ export default class PresencesAndSleep {
             <i class="icon-sleeps"></i> ${I18n.strings[self._config.language].sleep}
             </p>
             <p>${I18n.strings[self._config.language].duration} : <strong>${StringUtils.formatDuration(
-              moment.duration(sleep.duration, false)
+              sleep.duration,
+              false
             )}</strong></p>
             <p>${I18n.strings[self._config.language].bedtime} : <strong>${moment(sleep.start).format('LT')}</strong></p>
             <p>${I18n.strings[self._config.language].wakeup_time} : <strong>${moment(sleep.end).format(
@@ -340,10 +341,16 @@ export default class PresencesAndSleep {
       ],
       yAxis: [
         {
-          scale: true,
+          min: 0,
+          max(value) {
+            let minutes = moment.duration(value.max).asMinutes() + 30;
+            minutes = (Math.floor(minutes / 150) + 1) * 150;
+            return moment.duration(minutes, 'minutes').asMilliseconds();
+          },
+          interval: 9000000,
           axisLabel: {
             formatter(value) {
-              return StringUtils.roundHalfTime(value, self._config.contract.timezone);
+              return StringUtils.formatDuration(value, false);
             }
           },
           splitArea: {
