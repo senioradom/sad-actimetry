@@ -56,6 +56,13 @@ div.actimetry {
 .presences-and-sleep-tooltip {
   color: #222;
 
+  @at-root #{&}__date {
+    color: #00827d;
+
+    font-size: 14px;
+    font-weight: bold;
+  }
+
   .header {
     position: relative;
     top: 13px;
