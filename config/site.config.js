@@ -10,12 +10,12 @@ if (!ROOT) {
 const API = {
   development: {
     contract: 'https://contract.senioradom.com/api/1',
-    actimetry: 'https://gateway.senioradom.com/3',
+    actimetry: 'https://gateway.senioradom.com/3'
   },
   production: {
     contract: 'https://contract.senioradom.com/api/1',
-    actimetry: 'https://gateway.senioradom.com/3',
-  },
+    actimetry: 'https://gateway.senioradom.com/3'
+  }
 };
 
 const config = () => ({
@@ -32,12 +32,10 @@ const config = () => ({
   paths: {
     config: 'config',
     src: 'src',
-    dist: 'dist',
+    dist: 'dist'
   },
 
-  package: JSON.parse(
-    fs.readFileSync(path.join(ROOT, '/package.json'), { encoding: 'utf-8' }),
-  ),
+  package: JSON.parse(fs.readFileSync(path.join(ROOT, '/package.json'), { encoding: 'utf-8' }))
 });
 
 module.exports = config();
