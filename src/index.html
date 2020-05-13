@@ -80,13 +80,14 @@
       language: 'en',
     });
 
-    actimetry.presencesAndSleep.draw('#presences-and-sleep', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
-
-    actimetry.movesPerRoom.draw('#moves-per-room', oneWeekAgo, todayAtEndOfDay);
-
     actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {}, () => {
       console.log('Optional callback...');
     });
+
+    actimetry.presencesAndSleep.draw('#presences-and-sleep', oneWeekAgo, todayAtEndOfDay);
+
+    actimetry.movesPerRoom.draw('#moves-per-room', oneWeekAgo, todayAtEndOfDay);
+
 
     actimetry.temperatures.draw('#temperatures', oneWeekAgo, now);
 
