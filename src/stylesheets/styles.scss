@@ -53,6 +53,17 @@ div.actimetry {
   }
 }
 
+.moves-per-room-tooltip {
+  color: black;
+
+  @at-root #{&}__header {
+    color: #00827d;
+
+    font-size: 14px;
+    font-weight: bold;
+  }
+}
+
 .presences-and-sleep-tooltip {
   color: #222;
 
