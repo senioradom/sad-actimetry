@@ -2,6 +2,10 @@ import moment from 'moment-timezone';
 
 export default class StringUtils {
   static truncate(str, maxLength, useWordBoundary) {
+    if (!str) {
+      return str;
+    }
+
     if (str.length <= maxLength) {
       return str;
     }
@@ -14,9 +18,7 @@ export default class StringUtils {
   static formatDuration(duration, withSeconds = true) {
     const asSeconds = Math.round(moment.duration(duration).asSeconds());
     const hours = Math.floor(asSeconds / 3600);
-    const minutes = withSeconds
-      ? Math.floor((asSeconds - hours * 3600) / 60)
-      : Math.round((asSeconds - hours * 3600) / 60);
+    const minutes = withSeconds ? Math.floor((asSeconds - hours * 3600) / 60) : Math.round((asSeconds - hours * 3600) / 60);
     const seconds = withSeconds ? asSeconds - hours * 3600 - minutes * 60 : 0;
 
     if (withSeconds) {
