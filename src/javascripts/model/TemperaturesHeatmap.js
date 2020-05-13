@@ -1,10 +1,11 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 
 export default class TemperaturesHeatmap {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -37,15 +38,12 @@ export default class TemperaturesHeatmap {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const temperatures = await response.json();
 
@@ -63,9 +61,7 @@ export default class TemperaturesHeatmap {
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -100,10 +96,7 @@ export default class TemperaturesHeatmap {
           const currentHour = moment(value.createdAt)
             .tz(self._config.contract.timezone)
             .hour();
-          temporaryTemperaturesObject[theDate][currentHour] = Math.max(
-            temporaryTemperaturesObject[theDate][currentHour],
-            Number(`${Math.round(`${value.temp}e2`)}e-2`)
-          );
+          temporaryTemperaturesObject[theDate][currentHour] = Math.max(temporaryTemperaturesObject[theDate][currentHour], Number(`${Math.round(`${value.temp}e2`)}e-2`));
         });
       }
     });
@@ -220,19 +213,7 @@ export default class TemperaturesHeatmap {
           left: 'center',
           y: 575,
           inRange: {
-            color: [
-              '#0A2CFF',
-              '#006EFF',
-              '#3D97FF',
-              '#72B1FF',
-              '#21DB9B',
-              '#00FF00',
-              '#2EFF00',
-              '#F2FF00',
-              '#FF9F00',
-              '#FF7900',
-              '#FF0000'
-            ]
+            color: ['#0A2CFF', '#006EFF', '#3D97FF', '#72B1FF', '#21DB9B', '#00FF00', '#2EFF00', '#F2FF00', '#FF9F00', '#FF7900', '#FF0000']
           },
           formatter(params) {
             return `${(params * 2).toFixed() / 2}°`;

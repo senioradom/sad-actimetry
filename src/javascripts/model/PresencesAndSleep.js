@@ -1,11 +1,12 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 import StringUtils from '../StringUtils';
 
 export default class PresencesAndSleep {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -38,15 +39,12 @@ export default class PresencesAndSleep {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const roomsAndSleeps = await response.json();
 
@@ -58,16 +56,13 @@ export default class PresencesAndSleep {
       return;
     }
 
-    const hasActivities =
-      Object.values(roomsAndSleeps).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
+    const hasActivities = Object.values(roomsAndSleeps).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(roomsAndSleeps, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -138,7 +133,7 @@ export default class PresencesAndSleep {
     });
 
     dataset.push({
-      name: I18n.strings[this._config.language].sleep,
+      name: this._translationService.translate('PRESENCES_AND_SLEEPS.SLEEP'),
       type: 'bar',
       xAxisIndex: 1,
       yAxisIndex: 1,
@@ -218,7 +213,7 @@ export default class PresencesAndSleep {
         data: gfxConfig.rooms
       },
       title: {
-        text: I18n.strings[self._config.language].daily_sleep_duration,
+        text: self._translationService.translate('PRESENCES_AND_SLEEPS.DAILY_SLEEP_DURATION'),
         textStyle: {
           color: '#222',
           fontWeight: 'normal',
@@ -233,7 +228,7 @@ export default class PresencesAndSleep {
           animation: true
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding:21px;',
+        extraCssText: 'box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2); padding: 21px;',
         position(pos) {
           return {
             top: 10,
@@ -247,35 +242,49 @@ export default class PresencesAndSleep {
           sleep = self._tooltips[sleep[0].axisValue];
 
           let htmlTooltip = `<div class="presences-and-sleep-tooltip">
-          <p class="presences-and-sleep-tooltip__date">
-            ${moment(params[0].name, 'YYYY-MM-DD').format('DD/MM/YYYY')}
-          </p>
-          <p class="header header--activities">
-          <i class="icon-activities"></i> ${I18n.strings[self._config.language].presences}
-          </p>`;
+            <p class="presences-and-sleep-tooltip__date">
+              ${moment(params[0].name, 'YYYY-MM-DD').format('DD/MM/YYYY')}
+            </p>
+            <p class="header header--activities">
+                <i class="icon-activities"></i> ${self._translationService.translate('PRESENCES_AND_SLEEPS.PRESENCES')}
+            </p>
+          `;
+
           activites.forEach(item => {
-            htmlTooltip += `<p>${item.seriesName}: <strong>${StringUtils.formatDuration(
-              item.data,
-              false
-            )}</strong></p>`;
+            htmlTooltip += `
+                <p>${item.seriesName}:
+                    <strong>${StringUtils.formatDuration(item.data, false)}</strong>
+                </p>`;
           });
 
           if (sleep) {
             htmlTooltip += `
             <p class="header header--sleeps">
-            <i class="icon-sleeps"></i> ${I18n.strings[self._config.language].sleep}
+                <i class="icon-sleeps"></i> ${self._translationService.translate('PRESENCES_AND_SLEEPS.SLEEP')}
             </p>
-            <p>${I18n.strings[self._config.language].duration} : <strong>${StringUtils.formatDuration(
-              sleep.duration,
-              false
-            )}</strong></p>
-            <p>${I18n.strings[self._config.language].bedtime} : <strong>${moment(sleep.start).format('LT')}</strong></p>
-            <p>${I18n.strings[self._config.language].wakeup_time} : <strong>${moment(sleep.end).format(
-              'LT'
-            )}</strong></p>
-            <p>${I18n.strings[self._config.language].number_of_wakeups_during_the_night} : <strong>${
-              sleep.wakeNumber
-            }</strong></p>
+            <p>
+                ${self._translationService.translate('PRESENCES_AND_SLEEPS.DURATION', {
+                  duration: StringUtils.formatDuration(sleep.duration, false)
+                })}
+            </p>
+
+            <p>
+                ${self._translationService.translate('GLOBAL.BEDTIME', {
+                  time: moment(sleep.start).format('LT')
+                })}
+            </p>
+
+            <p>
+                ${self._translationService.translate('GLOBAL.WAKE_UP_TIME', {
+                  time: moment(sleep.end).format('LT')
+                })}
+            </p>
+
+            <p>
+                ${self._translationService.translate('PRESENCES_AND_SLEEPS.NUMBER_OF_WAKEUPS_OVERNIGHT', {
+                  number: sleep.wakeNumber
+                })}
+            </p>
             </div>`;
           }
 

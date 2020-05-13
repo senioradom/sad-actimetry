@@ -1,10 +1,11 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 
 export default class MovesPerRoom {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -37,15 +38,12 @@ export default class MovesPerRoom {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const movesPerRoom = await response.json();
 
@@ -57,16 +55,13 @@ export default class MovesPerRoom {
       return;
     }
 
-    const hasActivities =
-      Object.values(movesPerRoom.moves).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
+    const hasActivities = Object.values(movesPerRoom.moves).reduce((total, currentObj) => total + currentObj.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(movesPerRoom, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -163,21 +158,29 @@ export default class MovesPerRoom {
             totalMoves += item.data[1];
           });
 
-          let htmlTooltip = '<div style="color:black;">';
-          htmlTooltip += `<p style="font-weight:bold;color: #00827d;font-size:14px;">${moment(params[0].data[0]).format(
-            'DD/MM/YYYY'
-          )} - ${totalMoves} ${I18n.strings[self._config.language].total_moves}</p>`;
-          htmlTooltip += `<p>${I18n.strings[self._config.language].this_month} ${
-            beneficiary.length ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}` : ''
-          } ${I18n.strings[self._config.language].was_detected} <strong>${self._numberOfMovesThisMonth}</strong> ${
-            I18n.strings[self._config.language].times_2
-          }.</p>`;
+          let htmlTooltip = '<div class="moves-per-room-tooltip">';
+
+          htmlTooltip += `<p class="moves-per-room-tooltip__header">
+              ${self._translationService.translate(`MOVES_PER_ROOM.TOOLTIP_HEADER${totalMoves < 2 ? '_ONE_MOVE' : '_MANY_MOVES'}`, {
+                date: moment(params[0].data[0]).format('DD/MM/YYYY'),
+                number: totalMoves
+              })}
+            </p>`;
+
+          htmlTooltip += `<p>
+              ${self._translationService.translate(`MOVES_PER_ROOM.TOOLTIP_SUMMARY${totalMoves < 2 ? '_ONE_MOVE' : '_MANY_MOVES'}`, {
+                name: beneficiary.length ? `${beneficiary[0].firstname} ${beneficiary[0].lastname}` : '',
+                number: totalMoves
+              })}
+            </p>`;
 
           params.forEach(item => {
-            const rez = `<p>${item.data[2]}: <strong>${item.data[1]} ${
-              I18n.strings[self._config.language].moves
-            }</strong></p>`;
-            htmlTooltip += rez;
+            htmlTooltip += `<p>
+              ${self._translationService.translate(`MOVES_PER_ROOM.TOOLTIP_DESCRIPTION${item.data[1] < 2 ? '_ONE_MOVE' : '_MANY_MOVES'}`, {
+                room: item.data[2],
+                number: item.data[1]
+              })}
+            </p>`;
           });
 
           htmlTooltip += '</div>';

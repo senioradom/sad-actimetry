@@ -1,11 +1,12 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 import StringUtils from '../StringUtils';
 
 export default class DashboardTile1 {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -38,15 +39,12 @@ export default class DashboardTile1 {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const activitiesPerRoom = await response.json();
 
@@ -58,16 +56,13 @@ export default class DashboardTile1 {
       return;
     }
 
-    const hasActivities =
-      Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
+    const hasActivities = Object.values(activitiesPerRoom).reduce((total, currentObj) => total + currentObj.rooms.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(activitiesPerRoom, element);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 

@@ -1,10 +1,11 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 
 export default class Activities {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -37,15 +38,12 @@ export default class Activities {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const activities = await response.json();
 
@@ -63,9 +61,7 @@ export default class Activities {
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -97,14 +93,6 @@ export default class Activities {
 
     const myChart = echarts.init(document.querySelector(element));
     this._option = {
-      /*
-      title: {
-        text: i18n.strings[this.config.contract.language][`activities_${type}`],
-      },
-      legend: {
-        data: ['Activities'],
-      },
-      */
       color: ['#81b41d'],
       tooltip: {
         trigger: 'axis',

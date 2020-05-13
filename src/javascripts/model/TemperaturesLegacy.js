@@ -2,8 +2,10 @@ import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
 
 export default class TemperaturesLegacy {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -36,15 +38,12 @@ export default class TemperaturesLegacy {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const temperatures = await response.json();
     this._initDataset(temperatures, element, type);
@@ -83,14 +82,6 @@ export default class TemperaturesLegacy {
 
     const myChart = echarts.init(document.querySelector(element));
     this._option = {
-      /*
-      title: {
-        text: i18n.strings[this.config.contract.language][`temperatures_${type}`],
-      },
-      legend: {
-        data: ['Temperature'],
-      },
-      */
       color: ['#81b41d'],
       tooltip: {
         trigger: 'axis',

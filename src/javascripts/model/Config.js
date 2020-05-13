@@ -1,10 +1,7 @@
-import moment from 'moment-timezone';
-
 export default class Config {
-  constructor(settings) {
+  constructor(settings, translationService) {
+    this._translationService = translationService;
     this.isReady = false;
-    this.language = 'fr';
-
     this.api = 'https://gateway-v2.senioradom.com';
 
     this.init(settings);
@@ -36,31 +33,14 @@ export default class Config {
     if (this.contract) {
       this.isReady = true;
 
-      if (settings.language) {
-        this.language = settings.language;
-      } else if (this.contract.language) {
-        this.language = this.contract.language;
+      const language = settings.language || this.contract.language || 'fr';
+      if (this._translationService.language !== language) {
+        this._translationService.setLanguage(language);
       }
-
-      this.setLanguage(this.language);
 
       document.dispatchEvent(new CustomEvent('actimetryIsReady'));
     } else {
       throw new Error('No contract...');
     }
-  }
-
-  setLanguage(newLanguage) {
-    if (!this._validateLanguage(newLanguage)) {
-      this.language = 'fr';
-    } else {
-      this.language = newLanguage;
-    }
-
-    moment.locale(this.language);
-  }
-
-  _validateLanguage(language) {
-    return ['en', 'fr', 'es', 'sk', 'cs', 'zh'].includes(language);
   }
 }

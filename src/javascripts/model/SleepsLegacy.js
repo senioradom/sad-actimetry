@@ -1,10 +1,11 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 
 export default class SleepsLegacy {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -37,15 +38,12 @@ export default class SleepsLegacy {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const sleeps = await response.json();
 
@@ -63,9 +61,7 @@ export default class SleepsLegacy {
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -113,22 +109,26 @@ export default class SleepsLegacy {
         },
         formatter(sleeps) {
           return `
-          ${I18n.strings[self._config.language].bedtime} : ${moment(sleeps[0].data[2].start)
-            .tz(self._config.contract.timezone)
-            .format('LT')}<br>
-          ${I18n.strings[self._config.language].wakeup_time2} : ${moment(sleeps[0].data[2].end)
-            .tz(self._config.contract.timezone)
-            .format('LT')}<br>
-          ${
-            sleeps[0].data[2].wakeNumber > 0
-              ? `${I18n.strings[self._config.language].wokeup_at} ${sleeps[0].data[2].wakeNumber} ${
-                  sleeps[0].data[2].wakeNumber > 1
-                    ? `${I18n.strings[self._config.language].times}`
-                    : `${I18n.strings[self._config.language].time}`
-                }`
-              : `${I18n.strings[self._config.language].didnt_wake_up_at_night}`
-          }<br>
-          `;
+            ${self._translationService.translate('GLOBAL.BEDTIME', {
+              time: moment(sleeps[0].data[2].start)
+                .tz(self._config.contract.timezone)
+                .format('LT')
+            })}
+            <br>
+            ${self._translationService.translate('GLOBAL.WAKE_UP_TIME', {
+              time: moment(sleeps[0].data[2].end)
+                .tz(self._config.contract.timezone)
+                .format('LT')
+            })}
+            <br>
+            ${
+              sleeps[0].data[2].wakeNumber > 0
+                ? `${self._translationService.translate(`SLEEPS_LEGACY.WOKE_UP_OVERNIGHT${sleeps[0].data[2].wakeNumber < 2 ? '_ONE_TIME' : '_MANY_TIMES'}`, {
+                    number: sleeps[0].data[2].wakeNumber
+                  })}`
+                : `${self._translationService.translate('SLEEPS_LEGACY.DIDNT_WAKE_UP_OVERNIGHT')}`
+            }
+            `;
         }
       },
       calculable: true,

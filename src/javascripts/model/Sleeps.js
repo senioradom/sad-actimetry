@@ -1,11 +1,12 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 import StringUtils from '../StringUtils';
 
 export default class Sleeps {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -60,15 +61,7 @@ export default class Sleeps {
           '2019-06-13T00:00:00+0200'
         ],
         sleepsDurations: ['PT7H19M27S', 'PT6H22M', 'PT8H29M22S', 'PT4H5M58S', 'PT7H51M56S', 'PT8H55M15S', 'PT5H3M52S'],
-        sleepsDurationsDailyAverages: [
-          'PT6H50M50S',
-          'PT9H59M19S',
-          'PT9H10M7S',
-          'PT4H30M48S',
-          'PT5H59M11S',
-          'PT6H50M7S',
-          'PT7H3M59S'
-        ]
+        sleepsDurationsDailyAverages: ['PT6H50M50S', 'PT9H59M19S', 'PT9H10M7S', 'PT4H30M48S', 'PT5H59M11S', 'PT6H50M7S', 'PT7H3M59S']
       }
     };
 
@@ -121,21 +114,25 @@ export default class Sleeps {
           };
         },
         formatter(params) {
-          let htmlTooltip = `
-<div class="sleeps-tooltip">
-<p class="header">Le ${moment(params[0].axisValue).format('DD/MM/YYYY')}</p>
-`;
-          htmlTooltip += `
-<p>${I18n.strings[self._config.language].sleep_duration} : <strong>${StringUtils.formatDuration(
-            moment.duration(params[0].value),
-            false
-          )}</strong></p>
-<p>${I18n.strings[self._config.language].averages} ${moment(params[0].axisValue).format(
-            'dddd'
-          )} : <strong>${StringUtils.formatDuration(params[1].value, false)}</strong></p>
-</div>
-`;
-          return htmlTooltip;
+          return `
+            <div class="sleeps-tooltip">
+              <p class="header">
+              ${self._translationService.translate('SLEEPS.HEADER', {
+                date: moment(params[0].axisValue).format('DD/MM/YYYY')
+              })}
+              </p>
+              <p>
+                ${self._translationService.translate('SLEEPS.SLEEP_DURATION', {
+                  duration: StringUtils.formatDuration(moment.duration(params[0].value), false)
+                })}
+              </p>
+              <p>
+                ${self._translationService.translate('SLEEPS.SLEEPS_DAILY_AVERAGES', {
+                  day: moment(params[0].axisValue).format('dddd'),
+                  duration: StringUtils.formatDuration(params[1].value, false)
+                })}
+              </p>
+            </div>`;
         }
       },
       grid: {

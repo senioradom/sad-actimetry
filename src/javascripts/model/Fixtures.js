@@ -1,8 +1,10 @@
 import echarts from 'echarts/dist/echarts.min';
 
 export default class Fixtures {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 

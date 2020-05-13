@@ -1,10 +1,11 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 
 export default class Outings {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -37,15 +38,12 @@ export default class Outings {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const outings = await response.json();
 
@@ -63,9 +61,7 @@ export default class Outings {
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
     }
   }
 
@@ -112,13 +108,15 @@ export default class Outings {
         formatter(outings) {
           let tooltip = '';
           outings[0].data[2].forEach((outing, index) => {
-            tooltip += `<b>${I18n.strings[self._config.language].outing} #${index + 1}</b> : ${
-              I18n.strings[self._config.language].from
-            } ${moment(outing.start)
-              .tz(self._config.contract.timezone)
-              .format('LT')} ${I18n.strings[self._config.language].to} ${moment(outing.end)
-              .tz(self._config.contract.timezone)
-              .format('LT')}<br>`;
+            tooltip += `${self._translationService.translate('OUTINGS.OUTING_DETAILS', {
+              number: index + 1,
+              fromTime: moment(outing.start)
+                .tz(self._config.contract.timezone)
+                .format('LT'),
+              toTime: moment(outing.end)
+                .tz(self._config.contract.timezone)
+                .format('LT')
+            })}<br>`;
           });
 
           return tooltip;

@@ -1,11 +1,12 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import I18n from './I18n';
 import StringUtils from '../StringUtils';
 
 export default class Presences {
-  constructor(config) {
+  constructor(config, translationService) {
     this._config = config;
+    this._translationService = translationService;
+
     this._destroyRequest = false;
   }
 
@@ -47,15 +48,12 @@ export default class Presences {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(
-      `${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`,
-      {
-        headers: {
-          authorization: `Basic ${this._config.credentials}`
-        },
-        method: 'GET'
-      }
-    );
+    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+      headers: {
+        authorization: `Basic ${this._config.credentials}`
+      },
+      method: 'GET'
+    });
 
     const ranges = await response.json();
 
@@ -67,16 +65,13 @@ export default class Presences {
       return;
     }
 
-    const hasActivities =
-      Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
+    const hasActivities = Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
     if (hasActivities) {
       this._initDataset(ranges, element, options, callback);
     } else {
       document.querySelector(element).classList.remove('loading');
 
-      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${
-        I18n.strings[this._config.language].no_data
-      }</div>`;
+      document.querySelector(element).innerHTML = `<div class="actimetry__no-data">${this._translationService.translate('GLOBAL.NO_DATA')}</div>`;
 
       if (callback && typeof callback === 'function') {
         callback();
@@ -123,14 +118,7 @@ export default class Presences {
       graphHeight = 35 * gfxConfig.rooms.length;
     }
 
-    document
-      .querySelector(element)
-      .setAttribute(
-        'style',
-        `${document.querySelector(element).getAttribute('style')}; height: ${
-          isHeightSupplied ? graphHeight + 35 : graphHeight + 140
-        }px;`
-      );
+    document.querySelector(element).setAttribute('style', `${document.querySelector(element).getAttribute('style')}; height: ${isHeightSupplied ? graphHeight + 35 : graphHeight + 140}px;`);
 
     this._chart = echarts.init(document.querySelector(element));
 
@@ -372,19 +360,19 @@ export default class Presences {
   }
 
   _tooltip(objParam) {
-    // const self = this;
-    return `<b>${objParam.roomName}</b><br>
-                                <hr>
-                                ${objParam.start} - ${objParam.end}<br>
-                                <b>${I18n.strings[this._config.language].duration} :</b> ${objParam.duration}`;
+    return `<b>${objParam.roomName}</b>
+            <br>
+            <hr>
+            ${objParam.start} - ${objParam.end}<br>
+            ${this._translationService.translate('PRESENCES.DURATION', {
+              duration: objParam.duration
+            })}`;
   }
 
   _renameRoomsAndAddMask(presences, gfxConfig, lastUpdate) {
     presences.forEach((item, key) => {
       if (item.name) {
-        presences[key].value[0] = gfxConfig.rooms.indexOf(
-          `${item.value[4]}_${gfxConfig.roomsMapping.idLabel[item.value[0]]}`
-        );
+        presences[key].value[0] = gfxConfig.rooms.indexOf(`${item.value[4]}_${gfxConfig.roomsMapping.idLabel[item.value[0]]}`);
       } else {
         // OUTINGS
         presences[key].value[0] = 0;
@@ -393,17 +381,15 @@ export default class Presences {
 
     gfxConfig.rooms.forEach((room, index) => {
       if (room.includes('pressure_')) {
-        gfxConfig.rooms[index] = `${I18n.strings[this._config.language].bed} (${room
-          .replace('pressure_', '')
-          .toLowerCase()})`;
+        gfxConfig.rooms[index] = this._translationService.translate('PRESENCES.BED', {
+          room: room.replace('pressure_', '').toLowerCase()
+        });
       } else if (room.includes('door_opening_')) {
-        gfxConfig.rooms[index] = `${I18n.strings[this._config.language].door} (${room
-          .replace('door_opening_', '')
-          .toLowerCase()})`;
+        gfxConfig.rooms[index] = this._translationService.translate('PRESENCES.DOOR', {
+          room: room.replace('door_opening_', '').toLowerCase()
+        });
       } else {
-        gfxConfig.rooms[index] = room
-          .replace('presence_', '')
-          .replace('outing_', I18n.strings[this._config.language].outings);
+        gfxConfig.rooms[index] = room.replace('presence_', '').replace('outing_', this._translationService.translate('PRESENCES.OUTINGS'));
       }
 
       gfxConfig.rooms[index] = StringUtils.truncate(gfxConfig.rooms[index], this._isMobile ? 13 : 24, false);
@@ -447,10 +433,7 @@ export default class Presences {
         }
 
         const tooltip = this._tooltip({
-          roomName:
-            activity.rangeType === 'outing'
-              ? I18n.strings[this._config.language].outings
-              : gfxConfig.roomsMapping.idLabel[activity.room],
+          roomName: activity.rangeType === 'outing' ? this._translationService.translate('PRESENCES.OUTINGS') : gfxConfig.roomsMapping.idLabel[activity.room],
           start: moment(activity.start)
             .tz(this._config.contract.timezone)
             .format('LTS'),
