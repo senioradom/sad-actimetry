@@ -5,20 +5,20 @@ import 'custom-event-polyfill';
 
 import { version } from '../../package.json';
 
-import TranslationService from './model/TranslationService';
-import Config from './model/Config';
+import TranslationService from './services/TranslationService';
+import Config from './config/Config';
 
-import Presences from './model/Presences';
-import TemperaturesHeatmap from './model/TemperaturesHeatmap';
-import TemperaturesLegacy from './model/TemperaturesLegacy';
-import Outings from './model/Outings';
-import SleepsLegacy from './model/SleepsLegacy';
-import Activities from './model/Activities';
-import PresencesAndSleep from './model/PresencesAndSleep';
-import MovesPerRoom from './model/MovesPerRoom';
-import Sleeps from './model/Sleeps';
-import DashboardTile1 from './model/DashboardTile1';
-import Fixtures from './model/Fixtures';
+import Presences from './graphs/Presences';
+import TemperaturesHeatmap from './graphs/TemperaturesHeatmap';
+import TemperaturesLegacy from './graphs/TemperaturesLegacy';
+import Outings from './graphs/Outings';
+import SleepsLegacy from './graphs/SleepsLegacy';
+import Activities from './graphs/Activities';
+import PresencesAndSleep from './graphs/PresencesAndSleep';
+import MovesPerRoom from './graphs/MovesPerRoom';
+import Sleeps from './graphs/Sleeps';
+import DashboardTile1 from './graphs/DashboardTile1';
+import Fixtures from './graphs/Fixtures';
 
 import '../stylesheets/styles.scss';
 

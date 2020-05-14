@@ -1,6 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
-import StringUtils from '../StringUtils';
+import StringUtils from '../utils/StringUtils';
 
 export default class Sleeps {
   constructor(config, translationService) {
