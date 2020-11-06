@@ -300,9 +300,7 @@ export default class Presences {
   }
 
   _hydrate(objParam) {
-    const colors = this._colorRange(objParam.rangeType);
-
-    const obj = {};
+    let obj = {};
     obj.name = objParam.roomName;
 
     obj.value = [];
@@ -312,43 +310,41 @@ export default class Presences {
     obj.value[3] = objParam.tooltip;
     obj.value[4] = objParam.rangeType;
 
-    obj.itemStyle = {
-      color: colors.normal
-    };
-
-    obj.emphasis = {
-      itemStyle: {
-        color: colors.hover
-      }
-    };
+    obj = this._setItemStyles(obj, objParam);
 
     return obj;
   }
 
-  _colorRange(rangeType) {
+  _setItemStyles(obj, objParam) {
     const colors = {
+      strippedPattern: '',
       normal: '',
       hover: ''
     };
 
-    switch (rangeType.toLowerCase()) {
+    switch (objParam.rangeType.toLowerCase()) {
       case 'presence':
+        colors.strippedPattern = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJElEQVQYV2Ocet77PwMUZBtuZWSECYA4IDaYgHFAChlBBLI2AOMwFA++0ygPAAAAAElFTkSuQmCC';
         colors.normal = '#8abd36';
         colors.hover = '#95cf4b';
         break;
       case 'door_opening':
+        colors.strippedPattern = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJElEQVQYV2N8k6z4nwEKRObeZ2SECYA4IDaYgHFAChlBBLI2AM0TE1JtPulOAAAAAElFTkSuQmCC';
         colors.normal = '#ec6321';
         colors.hover = '#ec6321';
         break;
       case 'outing':
+        colors.strippedPattern = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJElEQVQYV2PkW7fiPwMUfAqKYGSECYA4IDaYgHFAChlBBLI2AMRkEy5MD0jpAAAAAElFTkSuQmCC';
         colors.normal = '#0eaea8';
         colors.hover = '#0eaea8';
         break;
       case 'pressure':
+        colors.strippedPattern = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJElEQVQYV2PMnir5nwEKpmY/Z2SECYA4IDaYgHFAChlBBLI2AKsIEk3sqguDAAAAAElFTkSuQmCC';
         colors.normal = '#6b9519';
         colors.hover = '#6b9519';
         break;
       case 'mask':
+        colors.strippedPattern = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJElEQVQYV2Ps7+//zwAFhYWFjIwwARAHxAYTMA5IISOIQNYGAOGSFAmytT3kAAAAAElFTkSuQmCC';
         colors.normal = '#8f8f8f';
         colors.hover = '#8f8f8f';
         break;
@@ -356,7 +352,50 @@ export default class Presences {
         break;
     }
 
-    return colors;
+    obj.itemStyle = {
+      color: colors.normal,
+      borderWidth: 0.4,
+      borderColor: colors.normal
+    };
+
+    obj.emphasis = {
+      itemStyle: {
+        color: colors.hover,
+        borderWidth: 0.4,
+        borderColor: colors.hover
+      }
+    };
+
+    if (!objParam.trusted) {
+      const strippedPatternImg = new Image();
+      strippedPatternImg.src = colors.strippedPattern;
+
+      obj.itemStyle = {
+        normal: {
+          opacity: 0.7,
+          color: {
+            image: strippedPatternImg,
+            repeat: 'repeat'
+          },
+          borderWidth: 0.4,
+          borderColor: colors.normal
+        }
+      };
+
+      obj.emphasis = {
+        itemStyle: {
+          opacity: 0.5,
+          color: {
+            image: strippedPatternImg,
+            repeat: 'repeat'
+          },
+          borderWidth: 0.4,
+          borderColor: colors.hover
+        }
+      };
+    }
+
+    return obj;
   }
 
   _tooltip(objParam) {
@@ -402,7 +441,8 @@ export default class Presences {
             start: lastUpdate,
             end: gfxConfig.max,
             tooltip: 'MASK',
-            rangeType: 'MASK'
+            rangeType: 'MASK',
+            trusted: true
           })
         );
       }
@@ -459,7 +499,8 @@ export default class Presences {
             start: moment(activity.displayStart).valueOf(),
             end: moment(activity.displayEnd).valueOf(),
             tooltip,
-            rangeType: activity.rangeType
+            rangeType: activity.rangeType,
+            trusted: Math.random() < 0.7
           })
         );
       });
