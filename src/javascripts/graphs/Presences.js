@@ -493,7 +493,7 @@ export default class Presences {
             end: moment(activity.displayEnd).valueOf(),
             tooltip,
             rangeType: activity.rangeType,
-            trusted: Math.random() < 0.7
+            trusted: activity.trusted
           })
         );
       });
