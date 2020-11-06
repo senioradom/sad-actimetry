@@ -15,6 +15,8 @@ export default class Presences {
       return;
     }
 
+    this._options = options;
+
     if (this._config.isReady) {
       this._fetchAndDraw(element, start, end, options, callback);
     } else {
@@ -353,32 +355,25 @@ export default class Presences {
     }
 
     obj.itemStyle = {
-      color: colors.normal,
-      borderWidth: 0.4,
-      borderColor: colors.normal
+      color: colors.normal
     };
 
     obj.emphasis = {
       itemStyle: {
-        color: colors.hover,
-        borderWidth: 0.4,
-        borderColor: colors.hover
+        color: colors.hover
       }
     };
 
-    if (!objParam.trusted) {
+    if (this._options.isAdminTrustedColorMode && !objParam.trusted) {
       const strippedPatternImg = new Image();
       strippedPatternImg.src = colors.strippedPattern;
 
       obj.itemStyle = {
         normal: {
-          opacity: 0.7,
           color: {
             image: strippedPatternImg,
             repeat: 'repeat'
-          },
-          borderWidth: 0.4,
-          borderColor: colors.normal
+          }
         }
       };
 
@@ -388,9 +383,7 @@ export default class Presences {
           color: {
             image: strippedPatternImg,
             repeat: 'repeat'
-          },
-          borderWidth: 0.4,
-          borderColor: colors.hover
+          }
         }
       };
     }
