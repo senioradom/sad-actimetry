@@ -18,12 +18,12 @@ export default class Presences {
     this._options = options;
 
     if (this._config.isReady) {
-      this._fetchAndDraw(element, start, end, options, callback);
+      this._fetchAndDraw(element, start, end, callback);
     } else {
       document.addEventListener(
         'actimetryIsReady',
         () => {
-          this._fetchAndDraw(element, start, end, options, callback);
+          this._fetchAndDraw(element, start, end, callback);
         },
         { once: true }
       );
@@ -43,7 +43,7 @@ export default class Presences {
     this._destroyRequest = true;
   }
 
-  async _fetchAndDraw(element, start, end, options, callback) {
+  async _fetchAndDraw(element, start, end, callback) {
     if (!this._config.contract || document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
@@ -59,17 +59,17 @@ export default class Presences {
 
     const ranges = await response.json();
 
-    this._checkForData(ranges, element, options, callback);
+    this._checkForData(ranges, element, callback);
   }
 
-  _checkForData(ranges, element, options, callback) {
+  _checkForData(ranges, element, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
     const hasActivities = Object.values(ranges.days).reduce((total, currentObj) => total + currentObj.activities.length, 0) > 0;
     if (hasActivities) {
-      this._initDataset(ranges, element, options, callback);
+      this._initDataset(ranges, element, callback);
     } else {
       document.querySelector(element).classList.remove('loading');
 
@@ -81,7 +81,7 @@ export default class Presences {
     }
   }
 
-  _initDataset(ranges, element, options, callback) {
+  _initDataset(ranges, element, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
@@ -102,20 +102,20 @@ export default class Presences {
     dataset = this._renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.lastUpdate).valueOf());
     gfxConfig.zoomLevel = this._zoomLevel(gfxConfig.min, gfxConfig.max);
 
-    this._setOptions(dataset, gfxConfig, element, options, callback);
+    this._setOptions(dataset, gfxConfig, element, callback);
   }
 
-  _setOptions(dataset, gfxConfig, element, options, callback) {
+  _setOptions(dataset, gfxConfig, element, callback) {
     if (document.querySelector(element) == null || this._destroyRequest) {
       return;
     }
 
     const self = this;
-    const isHeightSupplied = Object.prototype.hasOwnProperty.call(options, 'height') && options.height;
+    const isHeightSupplied = Object.prototype.hasOwnProperty.call(this._options, 'height') && this._options.height;
 
     let graphHeight;
     if (isHeightSupplied) {
-      graphHeight = options.height;
+      graphHeight = this._options.height;
     } else {
       graphHeight = 35 * gfxConfig.rooms.length;
     }
