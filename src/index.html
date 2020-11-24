@@ -80,7 +80,10 @@
       language: 'en',
     });
 
-    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, { isAdminTrustedColorMode: false }, () => {
+    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {
+      isAdminTrustedRangeMode: true,
+      isAdminTicksMode: true
+    }, () => {
       console.log('Optional callback...');
     });
 

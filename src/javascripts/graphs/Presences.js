@@ -50,14 +50,36 @@ export default class Presences {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+    const rangesResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
       headers: {
         authorization: `Basic ${this._config.credentials}`
       },
       method: 'GET'
     });
 
-    const ranges = await response.json();
+    const ranges = await rangesResponse.json();
+
+    if (this._options.isAdminTicksMode) {
+      const startAsUTC = moment(start)
+        .tz(this._config.contract.timezone)
+        .utc()
+        .format('YYYY-MM-DDTHH:mm:ss');
+
+      const endAsUTC = moment(end)
+        .tz(this._config.contract.timezone)
+        .endOf('day')
+        .utc()
+        .format('YYYY-MM-DDTHH:mm:ss');
+
+      const ticksResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ticks?end=${endAsUTC}Z&start=${startAsUTC}Z`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
+
+      this._options.ticks = await ticksResponse.json();
+    }
 
     this._checkForData(ranges, element, callback);
   }
@@ -99,7 +121,12 @@ export default class Presences {
     gfxConfig.roomsMapping = rooms.mapping;
 
     let dataset = this._rangesToPresences(ranges, gfxConfig);
+    if (this._options.isAdminTicksMode) {
+      dataset.push(...this._ticksToPresences(this._options.ticks, gfxConfig));
+    }
+
     dataset = this._renameRoomsAndAddMask(dataset, gfxConfig, moment(ranges.lastUpdate).valueOf());
+
     gfxConfig.zoomLevel = this._zoomLevel(gfxConfig.min, gfxConfig.max);
 
     this._setOptions(dataset, gfxConfig, element, callback);
@@ -354,6 +381,11 @@ export default class Presences {
         break;
     }
 
+    if (objParam.isTick) {
+      colors.normal = '#000000';
+      colors.hover = '#000000';
+    }
+
     obj.itemStyle = {
       color: colors.normal
     };
@@ -364,7 +396,7 @@ export default class Presences {
       }
     };
 
-    if (this._options.isAdminTrustedColorMode && !objParam.trusted) {
+    if (this._options.isAdminTrustedRangeMode && !objParam.trusted) {
       const strippedPatternImg = new Image();
       strippedPatternImg.src = colors.strippedPattern;
 
@@ -435,6 +467,7 @@ export default class Presences {
             end: gfxConfig.max,
             tooltip: 'MASK',
             rangeType: 'MASK',
+            isTick: false,
             trusted: true
           })
         );
@@ -493,10 +526,50 @@ export default class Presences {
             end: moment(activity.displayEnd).valueOf(),
             tooltip,
             rangeType: activity.rangeType,
+            isTick: false,
             trusted: activity.trusted
           })
         );
       });
+    });
+
+    return presences;
+  }
+
+  _ticksToPresences(ticks, gfxConfig) {
+    const presences = [];
+
+    ticks.forEach(tick => {
+      if (!['presence', 'pressure', 'door_opening', 'outing'].includes(tick.type)) {
+        return;
+      }
+
+      const tickCreationDateTimestamp = moment(tick.createdAt).valueOf();
+      if (tickCreationDateTimestamp < gfxConfig.min) {
+        gfxConfig.min = tickCreationDateTimestamp;
+      }
+      if (tickCreationDateTimestamp > gfxConfig.max) {
+        gfxConfig.max = tickCreationDateTimestamp;
+      }
+
+      const createdAt = moment(tick.createdAt);
+
+      const tooltip = `<b>Tick :</b><br>${moment(tick.createdAt)
+        .tz(this._config.contract.timezone)
+        .format('YYYY-MM-DD<br>HH:mm:ss')}`;
+
+      presences.push(
+        this._hydrate({
+          roomName: gfxConfig.roomsMapping.idLabel[tick.room],
+          roomId: tick.room,
+          start: createdAt.valueOf(),
+          end: createdAt.add(500, 'milliseconds').valueOf(),
+          tooltip,
+          rangeType: tick.type,
+          isTick: true,
+          trusted: true
+        })
+      );
     });
 
     return presences;
