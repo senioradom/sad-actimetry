@@ -219,6 +219,8 @@ export default class Presences {
         },
         {
           type: 'inside',
+          zoomOnMouseWheel: this._options.isAdminKeyboardNavigationMode ? 'shift' : true,
+          moveOnMouseWheel: this._options.isAdminKeyboardNavigationMode ? 'alt' : false,
           start: gfxConfig.zoomLevel,
           end: 100
         }

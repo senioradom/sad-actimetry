@@ -82,10 +82,11 @@
 
     actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {
       isAdminTrustedRangesMode: true,
-      isAdminTicksMode: true
+      isAdminTicksMode: true,
+      isAdminKeyboardNavigationMode: true,
     }, () => {
       console.log('Optional callback...');
-    });
+    })
 
     actimetry.presencesAndSleep.draw('#presences-and-sleep', oneWeekAgo, todayAtEndOfDay);
 
