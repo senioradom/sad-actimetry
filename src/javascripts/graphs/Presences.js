@@ -396,7 +396,7 @@ export default class Presences {
       }
     };
 
-    if (this._options.isAdminTrustedRangeMode && !objParam.trusted) {
+    if (this._options.isAdminTrustedRangesMode && !objParam.trusted) {
       const strippedPatternImg = new Image();
       strippedPatternImg.src = colors.strippedPattern;
 
