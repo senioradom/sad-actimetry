@@ -21,7 +21,7 @@ export default class Config {
       }
     }
 
-    const response = await fetch(`${this.api}/api/3/contracts/${settings.contractRef}`, {
+    const response = await fetch(`${this.api}/api/4/contracts/${settings.contractRef}`, {
       headers: {
         authorization: `Basic ${this.credentials}`
       },
