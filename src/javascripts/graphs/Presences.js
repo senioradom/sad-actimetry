@@ -31,12 +31,14 @@ export default class Presences {
   }
 
   zoom(fromTimestamp, toTimestamp) {
-    this._chart.dispatchAction({
-      type: 'dataZoom',
-      dataZoomIndex: 0,
-      startValue: fromTimestamp,
-      endValue: toTimestamp
-    });
+    if (this._chart) {
+      this._chart.dispatchAction({
+        type: 'dataZoom',
+        dataZoomIndex: 0,
+        startValue: fromTimestamp,
+        endValue: toTimestamp
+      });
+    }
   }
 
   stop() {
