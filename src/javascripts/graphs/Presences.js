@@ -189,6 +189,7 @@ export default class Presences {
     }
 
     this._option = {
+      progressive: dataset.length > 2999 ? 0 : 1,
       tooltip: {
         axisPointer: {
           type: 'shadow'
