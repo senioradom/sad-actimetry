@@ -55,7 +55,7 @@ export default class Presences {
     document.querySelector(element).classList.add('loading');
 
     let ranges = null;
-    if (this._config.isFakedData) {
+    if (this._config.isMocked) {
       ranges = presencesMock;
       const dateKey = Object.keys(ranges.days)[0];
       start = moment(ranges.days[dateKey].start);
@@ -72,7 +72,7 @@ export default class Presences {
     }
 
     if (this._options.isAdminTicksMode) {
-      if (this._config.isFakedData) {
+      if (this._config.isMocked) {
         this._options.ticks = ticksMock;
       } else {
         const startAsUTC = moment(start)

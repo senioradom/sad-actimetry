@@ -41,7 +41,7 @@ export default class PresencesAndSleep {
     document.querySelector(element).classList.add('loading');
 
     let roomsAndSleeps;
-    if (this._config.isFakedData) {
+    if (this._config.isMocked) {
       roomsAndSleeps = roomsSleepMock;
     } else {
       const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {

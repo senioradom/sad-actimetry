@@ -40,7 +40,7 @@ export default class SleepsLegacy {
     document.querySelector(element).classList.add('loading');
 
     let sleeps;
-    if (this._config.isFakedData) {
+    if (this._config.isMocked) {
       sleeps = sleepsLegacyMock;
     } else {
       const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {

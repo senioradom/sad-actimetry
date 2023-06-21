@@ -40,7 +40,7 @@ export default class Activities {
     document.querySelector(element).classList.add('loading');
 
     let activities;
-    if (this._config.isFakedData) {
+    if (this._config.isMocked) {
       activities = activitiesMock;
     } else {
       const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {

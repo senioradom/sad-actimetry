@@ -40,7 +40,7 @@ export default class TemperaturesHeatmap {
     document.querySelector(element).classList.add('loading');
 
     let temperatures;
-    if (this._config.isFakedData) {
+    if (this._config.isMocked) {
       temperatures = temperaturesMock;
     } else {
       const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {

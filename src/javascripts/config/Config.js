@@ -4,7 +4,7 @@ export default class Config {
   constructor(settings, translationService) {
     this._translationService = translationService;
     this.isReady = false;
-    this.isFakedData = settings.isFakedData;
+    this.isMocked = settings.isMocked;
     this.api = 'https://gateway-v2.senioradom.com';
 
     this.init(settings);
@@ -24,7 +24,7 @@ export default class Config {
       }
     }
 
-    if (this.isFakedData) {
+    if (this.isMocked) {
       this.contract = contractMock;
     } else {
       const response = await fetch(`${this.api}/api/4/contracts/${settings.contractRef}`, {
