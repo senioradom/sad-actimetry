@@ -1,5 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import sleepsLegacyMock from '../mocks/sleepsLegacyMock';
 
 export default class SleepsLegacy {
   constructor(config, translationService) {
@@ -38,14 +39,19 @@ export default class SleepsLegacy {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let sleeps;
+    if (this._config.isFakedData) {
+      sleeps = sleepsLegacyMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/sleeps?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const sleeps = await response.json();
+      sleeps = await response.json();
+    }
 
     this._checkForData(sleeps, element);
   }

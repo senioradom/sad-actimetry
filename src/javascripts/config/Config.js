@@ -1,7 +1,10 @@
+import contractMock from '../mocks/contractMock';
+
 export default class Config {
   constructor(settings, translationService) {
     this._translationService = translationService;
     this.isReady = false;
+    this.isFakedData = settings.isFakedData;
     this.api = 'https://gateway-v2.senioradom.com';
 
     this.init(settings);
@@ -21,14 +24,18 @@ export default class Config {
       }
     }
 
-    const response = await fetch(`${this.api}/api/4/contracts/${settings.contractRef}`, {
-      headers: {
-        authorization: `Basic ${this.credentials}`
-      },
-      method: 'GET'
-    });
+    if (this.isFakedData) {
+      this.contract = contractMock;
+    } else {
+      const response = await fetch(`${this.api}/api/4/contracts/${settings.contractRef}`, {
+        headers: {
+          authorization: `Basic ${this.credentials}`
+        },
+        method: 'GET'
+      });
 
-    this.contract = await response.json();
+      this.contract = await response.json();
+    }
 
     if (this.contract) {
       this.isReady = true;

@@ -1,5 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import activitiesMock from '../mocks/activitiesMock';
 
 export default class Activities {
   constructor(config, translationService) {
@@ -38,14 +39,19 @@ export default class Activities {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let activities;
+    if (this._config.isFakedData) {
+      activities = activitiesMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/activities?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const activities = await response.json();
+      activities = await response.json();
+    }
 
     this._checkForData(activities, element);
   }

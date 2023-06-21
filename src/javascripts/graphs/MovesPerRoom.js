@@ -1,5 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import movesPerRoomMock from '../mocks/movesPerRoomMock';
 
 export default class MovesPerRoom {
   constructor(config, translationService) {
@@ -38,14 +39,19 @@ export default class MovesPerRoom {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let movesPerRoom;
+    if (this._config.isFakedData) {
+      movesPerRoom = movesPerRoomMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/moves?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const movesPerRoom = await response.json();
+      movesPerRoom = await response.json();
+    }
 
     this._checkForData(movesPerRoom, element);
   }

@@ -1,5 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import temperaturesMock from '../mocks/temperaturesMock';
 
 export default class TemperaturesHeatmap {
   constructor(config, translationService) {
@@ -38,14 +39,19 @@ export default class TemperaturesHeatmap {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let temperatures;
+    if (this._config.isFakedData) {
+      temperatures = temperaturesMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/temperatures?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const temperatures = await response.json();
+      temperatures = await response.json();
+    }
 
     this._checkForData(temperatures, element);
   }

@@ -7,45 +7,92 @@
   <meta name="description" content=""/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data.min.js"></script>
+  <style>
+    [data-gfx] {
+      display: none;
+    }
+  </style>
+  <script>
+    const gfxToLoad = {
+      presences: true,
+      presencesAndSleep: true,
+      temperatures: true,
+      activities: true,
+      movesPerRoom: true,
+      outings: true,
+      sleeps: true,
+      sleepsLegacy: true,
+      dashboardTile1: true,
+      fixtures: false,
+    };
+  </script>
 </head>
 <body>
 
 <h1>SAD - Actimetry</h1>
 
-<h2>Presences</h2>
-<div id="presences" class="actimetry"></div>
+<div data-gfx="presences">
+  <h2>Presences</h2>
+  <div id="presences" class="actimetry"></div>
+</div>
 
-<h2>Moves per room</h2>
-<div id="moves-per-room" class="actimetry"></div>
+<div data-gfx="temperatures">
+  <h2>Temperatures</h2>
+  <div id="temperatures" class="actimetry temperatures"></div>
+</div>
 
-<h2>Temperatures</h2>
-<div id="temperatures" class="actimetry temperatures"></div>
+<div data-gfx="movesPerRoom">
+  <h2>Moves per room</h2>
+  <div id="moves-per-room" class="actimetry"></div>
+</div>
 
-<h2>Presences and Sleeps</h2>
-<div id="presences-and-sleep" class="actimetry presences-and-sleep"></div>
+<div data-gfx="presencesAndSleep">
+  <h2>Presences and Sleeps</h2>
+  <div id="presences-and-sleep" class="actimetry presences-and-sleep"></div>
+</div>
 
-<h2>Sleeps</h2>
-<div id="sleeps" class="actimetry"></div>
+<div data-gfx="activities">
+  <h2>Activities</h2>
+  <!--<p>24H</p>-->
+  <div id="activities-24h" class="actimetry"></div>
+  <!--
+  <p>Week</p>
+  <div id="activities-week" class="actimetry"></div>
+  -->
+</div>
 
-<h2>Sleeps (legacy)</h2>
-<div id="sleeps-legacy" class="actimetry"></div>
+<div data-gfx="sleeps">
+  <h2>Sleeps</h2>
+  <div id="sleeps" class="actimetry"></div>
+</div>
 
-<h2>Outings</h2>
-<div id="outings" class="actimetry"></div>
+<div data-gfx="sleepsLegacy">
+  <h2>Sleeps (legacy)</h2>
+  <div id="sleeps-legacy" class="actimetry"></div>
+</div>
 
-<h2>Activities</h2>
-<p>24H</p>
-<div id="activities-24h" class="actimetry"></div>
-<p>Week</p>
-<div id="activities-week" class="actimetry"></div>
+<div data-gfx="outings">
+  <h2>Outings</h2>
+  <div id="outings" class="actimetry"></div>
+</div>
 
-<h2>DashboardTile1</h2>
-<div id="dashboardTile1" class="actimetry"></div>
+<div data-gfx="dashboardTile1">
+  <h2>DashboardTile1</h2>
+  <div id="dashboardTile1" class="actimetry"></div>
+</div>
 
-<h2>Fixtures</h2>
-<div id="fixtures" class="actimetry"></div>
+<div data-gfx="fixtures">
+  <h2>Fixtures</h2>
+  <div id="fixtures" class="actimetry"></div>
+</div>
 
 <script>
+  const gfxKeysToLoad = Object.keys(gfxToLoad)
+    .filter(key => gfxToLoad[key] === true);
+  gfxKeysToLoad.forEach(gfx => {
+    document.querySelector('[data-gfx="' + gfx + '"]').style.display = 'block';
+  });
+
   var callback = function () {
     const timezone = 'Europe/Paris';
 
@@ -74,38 +121,62 @@
       .format('YYYY-MM-DD');
 
     const actimetry = new Actimetry({
-      username: 'user@domain.com',
-      password: '$passw0rD',
-      contractRef: 'A0000XXX',
+      isFakedData: true,
       language: 'en',
     });
 
-    actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {
-      isAdminTrustedRangesMode: true,
-      isAdminTicksMode: true,
-      isAdminKeyboardNavigationMode: true,
-    }, () => {
-      console.log('Optional callback...');
-    })
-
-    actimetry.presencesAndSleep.draw('#presences-and-sleep', oneWeekAgo, todayAtEndOfDay);
-
-    actimetry.movesPerRoom.draw('#moves-per-room', oneWeekAgo, todayAtEndOfDay);
-
-
-    actimetry.temperatures.draw('#temperatures', oneWeekAgo, now);
-
-    actimetry.sleeps.draw('#sleeps', oneWeekAgo, now);
-    actimetry.sleepsLegacy.draw('#sleeps-legacy', oneWeekAgo, now);
-
-    actimetry.outings.draw('#outings', oneWeekAgo, now);
-
-    actimetry.activities.draw('#activities-24h', twenty24hoursAgo, now);
-    actimetry.activities.draw('#activities-week', oneWeekAgo, now);
-
-    actimetry.fixtures.draw('#fixtures');
-
-    actimetry.dashboardTile1.draw('#dashboardTile1', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
+    Object.keys(gfxToLoad)
+      .forEach(gfxKey => {
+        switch (gfxKey) {
+          case 'presences':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.presences.draw('#presences', threeDaysAgoAtEndOfDay, todayAtEndOfDay, {
+              isAdminTrustedRangesMode: true,
+              isAdminTicksMode: true,
+              isAdminKeyboardNavigationMode: true,
+            }, () => {
+              console.log('Optional callback...');
+            });
+            break;
+          case 'movesPerRoom':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.movesPerRoom.draw('#moves-per-room', oneWeekAgo, todayAtEndOfDay);
+            break;
+          case 'temperatures':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.temperatures.draw('#temperatures', oneWeekAgo, now);
+            break;
+          case 'presencesAndSleep':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.presencesAndSleep.draw('#presences-and-sleep', oneWeekAgo, todayAtEndOfDay);
+            break;
+          case 'sleeps':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.sleeps.draw('#sleeps', oneWeekAgo, now);
+            break;
+          case 'sleepsLegacy':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.sleepsLegacy.draw('#sleeps-legacy', oneWeekAgo, now);
+            break;
+          case 'outings':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.outings.draw('#outings', oneWeekAgo, now);
+            break;
+          case 'activities':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.activities.draw('#activities-24h', twenty24hoursAgo, now);
+            // actimetry.activities.draw('#activities-week', oneWeekAgo, now);
+            break;
+          case 'dashboardTile1':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.dashboardTile1.draw('#dashboardTile1', threeDaysAgoAtEndOfDay, todayAtEndOfDay);
+            break;
+          case 'fixtures':
+            if (!gfxToLoad[gfxKey]) return;
+            actimetry.fixtures.draw('#fixtures');
+            break;
+        }
+      });
   };
 
   document.addEventListener('DOMContentLoaded', function () {

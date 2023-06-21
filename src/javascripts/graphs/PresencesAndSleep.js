@@ -1,6 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
 import StringUtils from '../utils/StringUtils';
+import roomsSleepMock from '../mocks/roomsSleepMock';
 
 export default class PresencesAndSleep {
   constructor(config, translationService) {
@@ -39,14 +40,19 @@ export default class PresencesAndSleep {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let roomsAndSleeps;
+    if (this._config.isFakedData) {
+      roomsAndSleeps = roomsSleepMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/rooms-sleep?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const roomsAndSleeps = await response.json();
+      roomsAndSleeps = await response.json();
+    }
 
     this._checkForData(roomsAndSleeps, element);
   }

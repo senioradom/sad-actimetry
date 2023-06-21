@@ -1,5 +1,7 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import presencesMock from '../mocks/presencesMock';
+import ticksMock from '../mocks/ticksMock';
 import StringUtils from '../utils/StringUtils';
 
 export default class Presences {
@@ -52,35 +54,47 @@ export default class Presences {
 
     document.querySelector(element).classList.add('loading');
 
-    const rangesResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
-
-    const ranges = await rangesResponse.json();
-
-    if (this._options.isAdminTicksMode) {
-      const startAsUTC = moment(start)
-        .tz(this._config.contract.timezone)
-        .utc()
-        .format('YYYY-MM-DDTHH:mm:ss');
-
-      const endAsUTC = moment(end)
-        .tz(this._config.contract.timezone)
-        .endOf('day')
-        .utc()
-        .format('YYYY-MM-DDTHH:mm:ss');
-
-      const ticksResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ticks?end=${endAsUTC}Z&start=${startAsUTC}Z`, {
+    let ranges = null;
+    if (this._config.isFakedData) {
+      ranges = presencesMock;
+      const dateKey = Object.keys(ranges.days)[0];
+      start = moment(ranges.days[dateKey].start);
+      end = moment(ranges.days[dateKey].end);
+    } else {
+      const rangesResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ranges?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
         headers: {
           authorization: `Basic ${this._config.credentials}`
         },
         method: 'GET'
       });
 
-      this._options.ticks = await ticksResponse.json();
+      ranges = await rangesResponse.json();
+    }
+
+    if (this._options.isAdminTicksMode) {
+      if (this._config.isFakedData) {
+        this._options.ticks = ticksMock;
+      } else {
+        const startAsUTC = moment(start)
+          .tz(this._config.contract.timezone)
+          .utc()
+          .format('YYYY-MM-DDTHH:mm:ss');
+
+        const endAsUTC = moment(end)
+          .tz(this._config.contract.timezone)
+          .endOf('day')
+          .utc()
+          .format('YYYY-MM-DDTHH:mm:ss');
+
+        const ticksResponse = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/ticks?end=${endAsUTC}Z&start=${startAsUTC}Z`, {
+          headers: {
+            authorization: `Basic ${this._config.credentials}`
+          },
+          method: 'GET'
+        });
+
+        this._options.ticks = await ticksResponse.json();
+      }
     }
 
     this._checkForData(ranges, element, callback);

@@ -1,5 +1,6 @@
 import echarts from 'echarts/dist/echarts.min';
 import moment from 'moment-timezone';
+import outingsMock from '../mocks/outingsMock';
 
 export default class Outings {
   constructor(config, translationService) {
@@ -38,14 +39,19 @@ export default class Outings {
 
     document.querySelector(element).classList.add('loading');
 
-    const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
-      headers: {
-        authorization: `Basic ${this._config.credentials}`
-      },
-      method: 'GET'
-    });
+    let outings;
+    if (this._config.isFakedData) {
+      outings = outingsMock;
+    } else {
+      const response = await fetch(`${this._config.api}/api/4/contracts/${this._config.contract.ref}/actimetry/outings?end=${end}&start=${start}&timezone=${this._config.contract.timezone}`, {
+        headers: {
+          authorization: `Basic ${this._config.credentials}`
+        },
+        method: 'GET'
+      });
 
-    const outings = await response.json();
+      outings = await response.json();
+    }
 
     this._checkForData(outings, element);
   }
@@ -72,16 +78,13 @@ export default class Outings {
 
     const dataset = [];
     const gfxConfig = {
-      min: Number.MAX_SAFE_INTEGER,
+      min: 0,
       max: Number.MIN_SAFE_INTEGER
     };
 
     Object.keys(outings).forEach(theDate => {
       dataset.push([theDate, outings[theDate].length, outings[theDate]]);
 
-      if (outings[theDate].length < gfxConfig.min) {
-        gfxConfig.min = outings[theDate].length;
-      }
       if (outings[theDate].length > gfxConfig.max) {
         gfxConfig.max = outings[theDate].length;
       }
